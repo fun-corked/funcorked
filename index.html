@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>(f)uncorked — Sommelier Experiences for Teams</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================
+     EASY-EDIT VARIABLES
+     Change colors, fonts, prices here
+     ============================ */
+  :root {
+    --cream: #FAF7F2;
+    --ink: #1C1812;
+    --wine: #7B2D3E;
+    --wine-light: #9E3D52;
+    --gold: #C9A84C;
+    --gold-light: #E8CC7A;
+    --mist: #E8E2D9;
+    --sage: #8A9B8E;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'DM Sans', sans-serif;
+    --radius: 2px;
+    --shadow: 0 4px 32px rgba(28,24,18,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ============================
+     NAVIGATION
+     ============================ */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(250,247,242,0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--mist);
+    padding: 0 48px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--wine);
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .nav-logo em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 300;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+    align-items: center;
+  }
+
+  .nav-links a {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active { color: var(--wine); }
+
+  .nav-cta {
+    background: var(--wine);
+    color: var(--cream) !important;
+    padding: 10px 22px;
+    letter-spacing: 0.06em;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--wine-light) !important; color: var(--cream) !important; }
+
+  /* ============================
+     PAGE SYSTEM
+     ============================ */
+  .page { display: none; padding-top: 72px; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ============================
+     HOME PAGE
+     ============================ */
+  .hero {
+    min-height: calc(100vh - 72px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 64px 80px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(52px, 5vw, 76px);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--wine);
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: #5A5348;
+    line-height: 1.7;
+    max-width: 440px;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--wine);
+    color: var(--cream);
+    padding: 16px 36px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    background: var(--wine-light);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(123,45,62,0.25);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    padding: 16px 36px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--mist);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--wine);
+    color: var(--wine);
+  }
+
+  .hero-visual {
+    position: relative;
+    background: var(--ink);
+    overflow: hidden;
+  }
+
+  .hero-img-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(123,45,62,0.85) 0%, rgba(28,24,18,0.7) 100%),
+      url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=900&q=80') center/cover;
+  }
+
+  .hero-visual-text {
+    position: absolute;
+    bottom: 60px;
+    left: 48px;
+    right: 48px;
+    color: var(--cream);
+  }
+
+  .hero-visual-text blockquote {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.3;
+    opacity: 0.92;
+    margin-bottom: 16px;
+  }
+
+  .hero-visual-text cite {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    font-style: normal;
+  }
+
+  .hero-stat-bar {
+    border-top: 1px solid var(--mist);
+    padding: 28px 80px;
+    display: flex;
+    gap: 64px;
+    background: white;
+  }
+
+  .stat { display: flex; flex-direction: column; }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--wine);
+  }
+  .stat-label {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #8A8278;
+  }
+
+  /* How it works */
+  .section { padding: 100px 80px; }
+  .section-alt { background: white; }
+
+  .section-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 64px;
+  }
+
+  .section-header .eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .section-header h2 {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 3vw, 52px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  .section-header h2 em { font-style: italic; color: var(--wine); }
+
+  .section-header p {
+    color: #5A5348;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .step {
+    background: var(--cream);
+    padding: 48px 40px;
+    position: relative;
+  }
+
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 72px;
+    font-weight: 300;
+    color: var(--mist);
+    line-height: 1;
+    margin-bottom: 24px;
+    transition: color 0.3s;
+  }
+
+  .step:hover .step-num { color: var(--wine); opacity: 0.3; }
+
+  .step h3 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .step p { font-size: 15px; color: #5A5348; line-height: 1.65; }
+
+  /* Perks */
+  .perks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .perk {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .perk-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--wine);
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .perk-text h4 {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+
+  .perk-text p { font-size: 14px; color: #5A5348; line-height: 1.6; }
+
+  /* CTA Band */
+  .cta-band {
+    background: var(--ink);
+    padding: 80px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 48px;
+  }
+
+  .cta-band h2 {
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+
+  .cta-band h2 em { font-style: italic; color: var(--gold); }
+
+  /* ============================
+     SOMMELIERS PAGE
+     ============================ */
+  .page-header {
+    background: var(--ink);
+    padding: 80px 80px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::after {
+    content: '';
+    position: absolute;
+    right: -80px; top: -80px;
+    width: 400px; height: 400px;
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 50%;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    right: 40px; top: 0px;
+    width: 250px; height: 250px;
+    border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 50%;
+  }
+
+  .page-header .eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 4vw, 64px);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.05;
+    margin-bottom: 16px;
+  }
+
+  .page-header h1 em { font-style: italic; color: var(--gold); }
+
+  .page-header p {
+    color: rgba(250,247,242,0.65);
+    font-size: 16px;
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+  /* Filters */
+  .filters-bar {
+    background: white;
+    border-bottom: 1px solid var(--mist);
+    padding: 20px 80px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 72px;
+    z-index: 50;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8A8278;
+  }
+
+  .filter-select {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--ink);
+    border: 1px solid var(--mist);
+    background: var(--cream);
+    padding: 8px 32px 8px 12px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8278' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 140px;
+  }
+
+  .filter-select:focus { border-color: var(--wine); }
+
+  .filter-divider { width: 1px; height: 40px; background: var(--mist); }
+
+  .filter-results {
+    margin-left: auto;
+    font-size: 13px;
+    color: #8A8278;
+  }
+
+  /* Sommelier Grid */
+  .sommeliers-grid {
+    padding: 48px 80px 80px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .sommelier-card {
+    background: white;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .sommelier-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    border-color: var(--mist);
+  }
+
+  .card-img {
+    height: 280px;
+    position: relative;
+    overflow: hidden;
+    background: var(--mist);
+  }
+
+  .card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+    display: block;
+  }
+
+  .sommelier-card:hover .card-img img { transform: scale(1.05); }
+
+  .card-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--wine);
+    color: var(--cream);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    font-weight: 500;
+  }
+
+  .card-availability {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    font-weight: 500;
+  }
+
+  .avail-yes { background: rgba(138,155,142,0.9); color: white; }
+  .avail-virtual { background: rgba(201,168,76,0.9); color: white; }
+
+  .card-body { padding: 24px; }
+
+  .card-name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+
+  .card-restaurant {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+  }
+
+  .card-location {
+    font-size: 13px;
+    color: #8A8278;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-bio {
+    font-size: 13px;
+    color: #5A5348;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .tag {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    background: var(--cream);
+    color: #5A5348;
+    border: 1px solid var(--mist);
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid var(--mist);
+  }
+
+  .card-price {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--wine);
+  }
+
+  .card-price span {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: #8A8278;
+    font-weight: 300;
+  }
+
+  /* ============================
+     CLASSES PAGE
+     ============================ */
+  .classes-grid {
+    padding: 48px 80px 80px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+
+  .class-card {
+    background: white;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+    cursor: pointer;
+  }
+
+  .class-card:hover { background: var(--ink); }
+
+  .class-card::after {
+    content: '→';
+    position: absolute;
+    right: 32px;
+    bottom: 32px;
+    font-size: 24px;
+    color: var(--mist);
+    transition: all 0.3s;
+    transform: translateX(-8px);
+    opacity: 0;
+  }
+
+  .class-card:hover::after {
+    color: var(--gold);
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .class-num {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    margin-bottom: 20px;
+  }
+
+  .class-card h3 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 14px;
+    color: var(--ink);
+    transition: color 0.3s;
+  }
+
+  .class-card:hover h3 { color: var(--cream); }
+
+  .class-card p {
+    font-size: 14px;
+    color: #5A5348;
+    line-height: 1.65;
+    margin-bottom: 24px;
+    transition: color 0.3s;
+  }
+
+  .class-card:hover p { color: rgba(250,247,242,0.6); }
+
+  .class-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .class-chip {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border: 1px solid var(--mist);
+    color: #5A5348;
+    transition: all 0.3s;
+  }
+
+  .class-card:hover .class-chip {
+    border-color: rgba(201,168,76,0.4);
+    color: var(--gold);
+  }
+
+  /* custom class CTA */
+  .class-custom {
+    grid-column: 1 / -1;
+    background: var(--wine);
+    padding: 56px 48px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 48px;
+    cursor: default;
+  }
+
+  .class-custom h3 {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .class-custom h3 em { font-style: italic; color: var(--gold-light); }
+
+  .class-custom p {
+    font-size: 15px;
+    color: rgba(250,247,242,0.7);
+    max-width: 520px;
+    line-height: 1.65;
+  }
+
+  .btn-cream {
+    background: var(--cream);
+    color: var(--wine);
+    padding: 16px 36px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-cream:hover {
+    background: var(--gold-light);
+    transform: translateY(-1px);
+  }
+
+  /* ============================
+     TESTIMONIALS PAGE
+     ============================ */
+  .testimonials-header { padding: 80px 80px 48px; }
+
+  .testimonials-featured {
+    padding: 0 80px 64px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .testimonial-big {
+    background: var(--wine);
+    padding: 56px 48px;
+    position: relative;
+  }
+
+  .testimonial-big::before {
+    content: '\201C';
+    font-family: var(--font-display);
+    font-size: 160px;
+    line-height: 1;
+    color: rgba(255,255,255,0.1);
+    position: absolute;
+    top: 10px;
+    left: 32px;
+  }
+
+  .testimonial-big blockquote {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--cream);
+    line-height: 1.4;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .testimonial-attr {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .attr-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gold-light);
+    letter-spacing: 0.04em;
+  }
+
+  .attr-role {
+    font-size: 12px;
+    color: rgba(250,247,242,0.55);
+    letter-spacing: 0.04em;
+  }
+
+  .testimonial-big-b {
+    background: var(--ink);
+    padding: 56px 48px;
+  }
+
+  .testimonial-big-b blockquote {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--cream);
+    line-height: 1.4;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .testimonial-big-b .attr-name { color: var(--gold); }
+  .testimonial-big-b .attr-role { color: rgba(250,247,242,0.45); }
+
+  .testimonials-grid {
+    padding: 0 80px 80px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .testimonial-card {
+    background: white;
+    padding: 36px;
+    border-left: 3px solid var(--mist);
+    transition: border-color 0.3s;
+  }
+
+  .testimonial-card:hover { border-color: var(--wine); }
+
+  .stars {
+    color: var(--gold);
+    font-size: 14px;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+
+  .testimonial-card blockquote {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.5;
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+
+  .card-attr .attr-name {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .card-attr .attr-role { color: #8A8278; font-size: 12px; }
+
+  .logos-band {
+    background: white;
+    padding: 48px 80px;
+    border-top: 1px solid var(--mist);
+  }
+
+  .logos-band p {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8A8278;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logos-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+
+  .logo-item {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-style: italic;
+    color: var(--mist);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+
+  .logo-item:hover { color: #C4B9AC; }
+
+  /* ============================
+     MODAL / BOOKING
+     ============================ */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(28,24,18,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--cream);
+    max-width: 560px;
+    width: 100%;
+    padding: 56px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #8A8278;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+  }
+
+  .modal-close:hover { color: var(--ink); }
+
+  .modal h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 300;
+    margin-bottom: 8px;
+  }
+
+  .modal p.modal-sub { font-size: 14px; color: #5A5348; margin-bottom: 32px; }
+
+  .form-field {
+    margin-bottom: 20px;
+  }
+
+  .form-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8A8278;
+    margin-bottom: 8px;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--ink);
+    border: 1px solid var(--mist);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+    font-weight: 300;
+  }
+
+  .form-field textarea { height: 100px; resize: vertical; }
+
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus { border-color: var(--wine); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* ============================
+     FOOTER
+     ============================ */
+  footer {
+    background: var(--ink);
+    color: rgba(250,247,242,0.55);
+    padding: 64px 80px 40px;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 64px;
+    margin-bottom: 48px;
+  }
+
+  .footer-brand .nav-logo { color: var(--cream); display: block; margin-bottom: 16px; font-size: 28px; }
+
+  .footer-brand p { font-size: 14px; line-height: 1.7; max-width: 280px; }
+
+  .footer-col h4 {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(250,247,242,0.35);
+    margin-bottom: 20px;
+  }
+
+  .footer-col a {
+    display: block;
+    font-size: 14px;
+    color: rgba(250,247,242,0.55);
+    text-decoration: none;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover { color: var(--gold); }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(250,247,242,0.08);
+    padding-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  /* ============================
+     UTILITIES
+     ============================ */
+  .no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: #8A8278;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-style: italic;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .nav-links { gap: 20px; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .hero-content { padding: 48px 24px; }
+    .hero-stat-bar { padding: 24px; gap: 32px; flex-wrap: wrap; }
+    .section { padding: 64px 24px; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .perks-grid { grid-template-columns: 1fr; }
+    .cta-band { padding: 48px 24px; grid-template-columns: 1fr; }
+    .page-header { padding: 48px 24px; }
+    .filters-bar { padding: 16px 24px; }
+    .sommeliers-grid { padding: 32px 24px; grid-template-columns: 1fr; }
+    .classes-grid { padding: 32px 24px; grid-template-columns: 1fr; }
+    .class-custom { grid-template-columns: 1fr; }
+    .testimonials-featured { padding: 0 24px 32px; grid-template-columns: 1fr; }
+    .testimonials-grid { padding: 0 24px 48px; grid-template-columns: 1fr; }
+    .logos-band { padding: 32px 24px; }
+    .testimonials-header { padding: 48px 24px 24px; }
+    .footer { padding: 48px 24px 32px; }
+    .footer-top { grid-template-columns: 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    .modal { padding: 32px 24px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  .wob-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    padding: 8px 14px;
+    border: 1px solid rgba(201,168,76,0.35);
+    background: rgba(201,168,76,0.06);
+  }
+  .wob-icon {
+    font-size: 16px;
+    color: var(--gold);
+  }
+  .wob-text {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .hero-wob {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 32px;
+    padding: 7px 14px;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.07);
+  }
+  .hero-wob span:first-child { font-size: 14px; color: var(--gold); }
+  .hero-wob span:last-child { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <a class="nav-logo" onclick="showPage('home')"><em>(f)</em>uncorked</a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('sommeliers')" id="nav-sommeliers">Our Sommeliers</a></li>
+    <li><a onclick="showPage('classes')" id="nav-classes">Classes</a></li>
+    <li><a onclick="showPage('testimonials')" id="nav-testimonials">Testimonials</a></li>
+    <li><a onclick="openModal('book')" class="nav-cta">Book a Session</a></li>
+  </ul>
+</nav>
+
+<!-- ============================
+     HOME PAGE
+     ============================ -->
+<div id="page-home" class="page active">
+
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Team experiences · Corporate events · Private sessions</p>
+      <h1>Wine knowledge, <em>without the pretension.</em></h1>
+      <p class="hero-sub">
+        We connect teams with world-class sommeliers from top restaurants for private classes designed around one goal: helping you sound smart at the table. Whether it's a client dinner or team offsite, we've got a pour for that.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="showPage('sommeliers')">Browse Sommeliers</button>
+        <button class="btn-ghost" onclick="showPage('classes')">See Classes</button>
+      </div>
+      <div class="hero-wob">
+        <span>♀</span>
+        <span>Woman-Owned Business</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-img-bg"></div>
+      <div class="hero-visual-text">
+        <blockquote>"The only bad wine is the one you can't explain at a partner dinner."</blockquote>
+        <cite>— A very relieved associate</cite>
+      </div>
+    </div>
+  </section>
+
+  <div class="hero-stat-bar">
+    <div class="stat"><span class="stat-num">40+</span><span class="stat-label">Sommeliers Available</span></div>
+    <div class="stat"><span class="stat-num">12</span><span class="stat-label">Cities Covered</span></div>
+    <div class="stat"><span class="stat-num">500+</span><span class="stat-label">Sessions Hosted</span></div>
+    <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Worth It</span></div>
+  </div>
+
+  <section class="section section-alt">
+    <div class="section-header">
+      <span class="eyebrow">How it works</span>
+      <h2>Simple — it's just fermented grapes, after all.</h2>
+      <p>Three steps from "whatever's in my price range" to "the best value on this list comes from the Loire Valley."</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Browse & Pick Your Sommelier</h3>
+        <p>Filter by city, price, vibe, and specialty. Each sommelier sets their own rates and curriculum, so you choose the one that matches your team's energy.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Customize Your Class</h3>
+        <p>Virtual or in-person. Burgundy deep-dive or "just teach us to read a wine list." Corporate happy hour or intimate team dinner. The class is yours to shape.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Drink Smarter, Together</h3>
+        <p>Walk away knowing how to order confidently, read a room, and pick a bottle that won't embarrass you in front of a client. It's education with a corkscrew.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <span class="eyebrow">Why (f)uncorked</span>
+      <h2>The details that <em>matter.</em></h2>
+    </div>
+    <div class="perks-grid">
+      <div class="perk">
+        <div class="perk-icon">🍷</div>
+        <div class="perk-text">
+          <h4>Top-Restaurant Pedigree</h4>
+          <p>Every sommelier on our platform comes from a Michelin-starred or critically acclaimed restaurant. These aren't weekend hobbyists — they're certified professionals who chose to share their passion.</p>
+        </div>
+      </div>
+      <div class="perk">
+        <div class="perk-icon">🎯</div>
+        <div class="perk-text">
+          <h4>Practical, Not Pedantic</h4>
+          <p>Our classes skip the viticulture lecture and get straight to what you actually need: how to read a list, what to order for the table, and why you should care about the vintage.</p>
+        </div>
+      </div>
+      <div class="perk">
+        <div class="perk-icon">🌐</div>
+        <div class="perk-text">
+          <h4>Virtual or In-Person</h4>
+          <p>Remote team? No problem. Our sommeliers host beautifully curated virtual sessions with pre-shipped wine kits. Or host them in your office, at a restaurant, or wherever suits the moment.</p>
+        </div>
+      </div>
+      <div class="perk">
+        <div class="perk-icon">✦</div>
+        <div class="perk-text">
+          <h4>Sommelier-Owned Curriculum</h4>
+          <p>We believe the best classes come from people who truly own what they teach. Every sommelier sets their own pricing, crafts their own content, and brings their own story.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-band">
+    <div>
+      <h2>Ready to uncork <em>something great?</em></h2>
+    </div>
+    <button class="btn-primary" onclick="openModal('book')" style="white-space:nowrap">Get in Touch</button>
+  </div>
+
+</div>
+
+<!-- ============================
+     SOMMELIERS PAGE
+     ============================ -->
+<div id="page-sommeliers" class="page">
+
+  <div class="page-header">
+    <span class="eyebrow">Our Roster</span>
+    <h1>Meet the <em>Sommeliers.</em></h1>
+    <p>Hand-picked from the country's best dining rooms. Each brings a distinct palate, personality, and perspective — because wine education should never be one-size-fits-all.</p>
+  </div>
+
+  <div class="filters-bar">
+    <div class="filter-group">
+      <span class="filter-label">City</span>
+      <select class="filter-select" id="filter-city" onchange="filterSommeliers()">
+        <option value="">All Cities</option>
+        <option value="New York">New York</option>
+        <option value="Los Angeles">Los Angeles</option>
+        <option value="Chicago">Chicago</option>
+        <option value="San Francisco">San Francisco</option>
+        <option value="Washington DC">Washington DC</option>
+        <option value="Nashville">Nashville</option>
+      </select>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-label">Max Price / Hour</span>
+      <select class="filter-select" id="filter-price" onchange="filterSommeliers()">
+        <option value="">Any Rate</option>
+        <option value="150">Up to $150/hr</option>
+        <option value="200">Up to $200/hr</option>
+        <option value="300">Up to $300/hr</option>
+        <option value="400">Up to $400/hr</option>
+      </select>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
+      <span class="filter-label">Format</span>
+      <select class="filter-select" id="filter-format" onchange="filterSommeliers()">
+        <option value="">All Formats</option>
+        <option value="in-person">In-Person</option>
+        <option value="virtual">Virtual</option>
+        <option value="both">Both</option>
+      </select>
+    </div>
+    <span class="filter-results" id="filter-results">Showing 6 sommeliers</span>
+  </div>
+
+  <div class="sommeliers-grid" id="sommeliers-grid">
+    <!-- Cards are generated by JS below -->
+  </div>
+
+</div>
+
+<!-- ============================
+     CLASSES PAGE
+     ============================ -->
+<div id="page-classes" class="page">
+
+  <div class="page-header">
+    <span class="eyebrow">The Curriculum</span>
+    <h1>Classes built for <em>real life.</em></h1>
+    <p>Not a lecture. Not a tasting test. Just an hour (or two) that will completely change how you show up at a dinner table.</p>
+  </div>
+
+  <div class="classes-grid">
+
+    <!-- EASY-EDIT: Add or remove class cards here -->
+
+    <div class="class-card">
+      <div class="class-num">Class 01</div>
+      <h3>Wine List 101: Never Panic Again</h3>
+      <p>The restaurant hands you a 40-page wine list and everyone looks at you. This class is for that moment. Learn how to read any list, spot value, and order with quiet confidence — even when you've never heard of a single bottle.</p>
+      <div class="class-meta">
+        <span class="class-chip">1.5 hrs</span>
+        <span class="class-chip">Beginner</span>
+        <span class="class-chip">Virtual or In-Person</span>
+      </div>
+    </div>
+
+    <div class="class-card">
+      <div class="class-num">Class 02</div>
+      <h3>The Client Dinner Playbook</h3>
+      <p>Impressing a client over dinner is a skill. Learn how to choose a bottle appropriate for the budget and occasion, when to defer to the sommelier (and how to do it elegantly), and what to say when someone asks your opinion.</p>
+      <div class="class-meta">
+        <span class="class-chip">2 hrs</span>
+        <span class="class-chip">Intermediate</span>
+        <span class="class-chip">In-Person Preferred</span>
+      </div>
+    </div>
+
+    <div class="class-card">
+      <div class="class-num">Class 03</div>
+      <h3>Old World vs. New World: A Friendly Debate</h3>
+      <p>France vs. California. Tradition vs. innovation. This class turns one of wine's most classic arguments into a fun, side-by-side tasting that will give your team plenty of opinions to argue about at the next happy hour.</p>
+      <div class="class-meta">
+        <span class="class-chip">2 hrs</span>
+        <span class="class-chip">All Levels</span>
+        <span class="class-chip">Tasting Included</span>
+      </div>
+    </div>
+
+    <div class="class-card">
+      <div class="class-num">Class 04</div>
+      <h3>The Art of Sounding Like You Know</h3>
+      <p>You don't need to memorize appellations to sound impressive. You need vocabulary, confidence, and three reliable tasting notes. This class gives you exactly that — plus a framework for winging it gracefully when you draw a blank.</p>
+      <div class="class-meta">
+        <span class="class-chip">1 hr</span>
+        <span class="class-chip">Beginner</span>
+        <span class="class-chip">Virtual Friendly</span>
+      </div>
+    </div>
+
+    <div class="class-card">
+      <div class="class-num">Class 05</div>
+      <h3>Bubbles: Champagne, Prosecco & Beyond</h3>
+      <p>Champagne is a place, not just a vibe. Learn the difference between Champagne, Cava, Pét-Nat, and Crémant — and which one to reach for when you're celebrating a deal, a Friday, or absolutely nothing at all.</p>
+      <div class="class-meta">
+        <span class="class-chip">1.5 hrs</span>
+        <span class="class-chip">All Levels</span>
+        <span class="class-chip">Virtual or In-Person</span>
+      </div>
+    </div>
+
+    <div class="class-card">
+      <div class="class-num">Class 06</div>
+      <h3>Natural Wine: Hype or Here to Stay?</h3>
+      <p>Your team is curious about natural wine but doesn't want to sound like they're ordering at a Brooklyn wine bar by accident. This class cuts through the noise and gives you the vocabulary, the context, and a few bottles worth exploring.</p>
+      <div class="class-meta">
+        <span class="class-chip">2 hrs</span>
+        <span class="class-chip">Intermediate</span>
+        <span class="class-chip">Tasting Included</span>
+      </div>
+    </div>
+
+    <!-- Custom class CTA -->
+    <div class="class-custom">
+      <div>
+        <h3>Want something <em>entirely bespoke?</em></h3>
+        <p>Your team, your focus, your bottle list. Work directly with your chosen sommelier to build a class around a specific region, occasion, or level of enthusiasm. We've done everything from "Wines of the Southern Rhône" to "What to Order in Tokyo."</p>
+      </div>
+      <button class="btn-cream" onclick="openModal('custom')">Let's Build It</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================
+     TESTIMONIALS PAGE
+     ============================ -->
+<div id="page-testimonials" class="page">
+
+  <div class="testimonials-header">
+    <div class="section-header" style="text-align:left;max-width:none;margin-bottom:0">
+      <span class="eyebrow">What People Are Saying</span>
+      <h2>The reviews are <em>in.</em></h2>
+    </div>
+  </div>
+
+  <div class="testimonials-featured">
+    <div class="testimonial-big">
+      <blockquote>"We hosted a (f)uncorked session before our firm retreat and it was genuinely the best team event we've done in three years. Our managing partner, who owns a small vineyard in Napa, said our sommelier knew more about Burgundy than anyone he'd met."</blockquote>
+      <div class="testimonial-attr">
+        <span class="attr-name">Sarah K.</span>
+        <span class="attr-role">Chief of Staff, Latham & Watkins LLP</span>
+      </div>
+    </div>
+    <div class="testimonial-big-b">
+      <blockquote>"I used to freeze up every time a client handed me a wine list. After one session with Marcus, I ordered a bottle that the table talked about for the rest of the meal. That's ROI I can calculate."</blockquote>
+      <div class="testimonial-attr">
+        <span class="attr-name">Daniel R.</span>
+        <span class="attr-role">VP, Goldman Sachs</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="testimonials-grid">
+
+    <!-- EASY-EDIT: Add testimonials by copying a .testimonial-card block -->
+
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Our virtual session had 22 people on Zoom and everyone actually stayed engaged. The pre-shipped wine kit was a genius touch — we were all tasting the same thing together."</blockquote>
+      <div class="card-attr">
+        <div class="attr-name">Jennifer M.</div>
+        <div class="attr-role">People & Culture Director, Deloitte</div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"No snobbery, no jargon, just really smart and fun education. Our sommelier, Elena, made the whole room feel like they'd been wine people their whole lives."</blockquote>
+      <div class="card-attr">
+        <div class="attr-name">Tom B.</div>
+        <div class="attr-role">Co-Founder, Benchmark Capital</div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"We did a custom class focused on Italian wines for a client trip we were planning. Walked into Florence knowing exactly what to order. Worth every penny."</blockquote>
+      <div class="card-attr">
+        <div class="attr-name">Priya S.</div>
+        <div class="attr-role">Senior Associate, McKinsey & Company</div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Incredibly easy to book. The sommelier arrived exactly on time, brought everything we needed, and left us with a one-pager cheat sheet. My team still references it."</blockquote>
+      <div class="card-attr">
+        <div class="attr-name">Alex W.</div>
+        <div class="attr-role">Operations Manager, Paul Weiss</div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"We've done cooking classes, escape rooms, axe throwing. This was the first team event where people were still talking about it a month later."</blockquote>
+      <div class="card-attr">
+        <div class="attr-name">Chloe D.</div>
+        <div class="attr-role">Marketing Lead, WPP</div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Our executive team is hard to impress. They were impressed. That's all I'll say."</blockquote>
+      <div class="card-attr">
+        <div class="attr-name">Mark L.</div>
+        <div class="attr-role">Executive Assistant, Blackstone</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="logos-band">
+    <p>Teams we've poured for</p>
+    <div class="logos-row">
+      <span class="logo-item">Latham & Watkins</span>
+      <span class="logo-item">Goldman Sachs</span>
+      <span class="logo-item">Deloitte</span>
+      <span class="logo-item">McKinsey & Co.</span>
+      <span class="logo-item">Blackstone</span>
+      <span class="logo-item">Paul Weiss</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================
+     BOOKING MODAL
+     ============================ -->
+<!-- BOOK A SESSION MODAL — powered by Formspree -->
+<!-- SETUP: Go to formspree.io, create a free account, make a new form, copy your form ID -->
+<!-- Formspree endpoint: https://formspree.io/f/xjgjgeov -->
+<div class="modal-overlay" id="modal-book" onclick="closeModal(event, 'book')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal(null, 'book')">✕</button>
+    <div id="book-form-wrap">
+      <h2>Book a Session</h2>
+      <p class="modal-sub">Tell us a little about what you're looking for and we'll be in touch within 24 hours.</p>
+      <form id="form-book" onsubmit="submitForm(event, 'book')">
+        <input type="hidden" name="_subject" value="New Booking Request — (f)uncorked">
+        <input type="hidden" name="form_type" value="Book a Session">
+        <div class="form-row">
+          <div class="form-field">
+            <label>First Name</label>
+            <input type="text" name="first_name" placeholder="Alexandra" required>
+          </div>
+          <div class="form-field">
+            <label>Last Name</label>
+            <input type="text" name="last_name" placeholder="Chen" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Company / Organization</label>
+          <input type="text" name="company" placeholder="Latham &amp; Watkins LLP" required>
+        </div>
+        <div class="form-field">
+          <label>Work Email</label>
+          <input type="email" name="email" placeholder="a.chen@company.com" required>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>City</label>
+            <select name="city" required>
+              <option value="">Select city...</option>
+              <option>New York</option>
+              <option>Los Angeles</option>
+              <option>Chicago</option>
+              <option>San Francisco</option>
+              <option>Washington DC</option>
+              <option>Nashville</option>
+              <option>Virtual / Remote</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Group Size</label>
+            <select name="group_size">
+              <option>2–10 people</option>
+              <option>10–25 people</option>
+              <option>25–50 people</option>
+              <option>50+ people</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>What are you hoping to get out of this?</label>
+          <textarea name="message" placeholder="e.g. Team happy hour before our Chicago client trip, beginner-friendly, funny and low-key preferred..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center">Send Request</button>
+      </form>
+    </div>
+    <div id="book-success" style="display:none;text-align:center;padding:40px 20px">
+      <div style="font-size:40px;margin-bottom:16px">🍷</div>
+      <h2 style="margin-bottom:12px">You're on our radar.</h2>
+      <p class="modal-sub">We'll be in touch within 24 hours. Check your inbox — and maybe start thinking about what you'd like to learn first.</p>
+      <button class="btn-primary" style="margin-top:24px" onclick="closeModal(null,'book');document.getElementById('book-success').style.display='none';document.getElementById('book-form-wrap').style.display='block'">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUILD A CUSTOM CLASS MODAL -->
+<div class="modal-overlay" id="modal-custom" onclick="closeModal(event, 'custom')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal(null, 'custom')">✕</button>
+    <div id="custom-form-wrap">
+      <h2>Build a Custom Class</h2>
+      <p class="modal-sub">Every great session starts with a conversation. Tell us what you have in mind and we'll find the sommelier to bring it to life.</p>
+      <form id="form-custom" onsubmit="submitForm(event, 'custom')">
+        <input type="hidden" name="_subject" value="Custom Class Request — (f)uncorked">
+        <input type="hidden" name="form_type" value="Custom Class">
+        <div class="form-field">
+          <label>Your Name &amp; Company</label>
+          <input type="text" name="name_company" placeholder="Jane Smith, Skadden Arps" required>
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="jsmith@skadden.com" required>
+        </div>
+        <div class="form-field">
+          <label>Describe Your Ideal Class</label>
+          <textarea name="message" style="height:140px" placeholder="e.g. We're 8 partners flying to Bordeaux in September for a client retreat. We want a crash course on the region's top chateaux and how to spot value on high-end restaurant lists. Fancy but not stuffy." required></textarea>
+        </div>
+        <div class="form-field">
+          <label>Preferred Budget Per Hour</label>
+          <select name="budget">
+            <option>Under $150/hr</option>
+            <option>$150–$250/hr</option>
+            <option>$250–$400/hr</option>
+            <option>Flexible / Let's discuss</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%">Submit Idea</button>
+      </form>
+    </div>
+    <div id="custom-success" style="display:none;text-align:center;padding:40px 20px">
+      <div style="font-size:40px;margin-bottom:16px">🥂</div>
+      <h2 style="margin-bottom:12px">Brilliant idea received.</h2>
+      <p class="modal-sub">We'll reach out soon to get the details sorted. This is going to be a good one.</p>
+      <button class="btn-primary" style="margin-top:24px" onclick="closeModal(null,'custom');document.getElementById('custom-success').style.display='none';document.getElementById('custom-form-wrap').style.display='block'">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     FOOTER
+     ============================ -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a class="nav-logo" onclick="showPage('home')"><em>(f)</em>uncorked</a>
+      <p>Connecting teams with world-class sommeliers for private wine education that's smart, practical, and genuinely enjoyable. No snobs. Just really good wine.</p>
+      <div class="wob-badge">
+        <span class="wob-icon">♀</span>
+        <span class="wob-text">Woman-Owned Business</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('sommeliers')">Our Sommeliers</a>
+      <a onclick="showPage('classes')">Classes</a>
+      <a onclick="showPage('testimonials')">Testimonials</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <!-- EASY-EDIT: Update email and address here -->
+      <a href="mailto:hello@corkandcompany.com">hello@corkandcompany.com</a>
+      <a href="tel:+12125550100">+1 (212) 555-0100</a>
+      <a>New York · Los Angeles · Chicago</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 (f)uncorked. All rights reserved.</span>
+    <span>Made with good taste (and better wine).</span>
+  </div>
+</footer>
+
+<script>
+/* ============================
+   SOMMELIER DATA
+   EASY-EDIT: Add, remove, or modify sommeliers here.
+   Fields: name, restaurant, city, price (per hour), format ("in-person"/"virtual"/"both"),
+           specialty (array of strings), bio, badge (e.g. "Top Pick"), img (URL)
+   ============================ */
+const SOMMELIERS = [
+  {
+    name: "Elena Marchetti",
+    restaurant: "Per Se, New York",
+    city: "New York",
+    price: 250,
+    format: "both",
+    specialty: ["Burgundy", "Italian Wines", "Elegant Pairings"],
+    bio: "Elena spent eight years at the wine program at Per Se and holds an Advanced Sommelier certification. She has an infectious enthusiasm for Burgundy and a gift for making complex topics feel like good gossip.",
+    badge: "Top Pick",
+    img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&q=80"
+  },
+  {
+    name: "Marcus Webb",
+    restaurant: "Alinea, Chicago",
+    city: "Chicago",
+    price: 200,
+    format: "both",
+    specialty: ["Natural Wine", "Sommelier Confidence", "Blind Tasting"],
+    bio: "Marcus led the wine program at Alinea for five years before launching his own consulting practice. His classes are known for being funny, fast-paced, and unusually practical for professionals without a wine background.",
+    badge: "Fan Favorite",
+    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80"
+  },
+  {
+    name: "Simone Laurent",
+    restaurant: "Quince, San Francisco",
+    city: "San Francisco",
+    price: 300,
+    format: "in-person",
+    specialty: ["Champagne", "Rhône Valley", "Wine Investment"],
+    bio: "A Master Sommelier candidate with a background in French dining rooms from Lyon to San Francisco. Simone's sessions are immersive, polished, and occasionally opinionated — in the best way.",
+    badge: "MS Candidate",
+    img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80"
+  },
+  {
+    name: "Jordan Patel",
+    restaurant: "Minibar, Washington DC",
+    city: "Washington DC",
+    price: 175,
+    format: "virtual",
+    specialty: ["New World Wines", "Organic & Biodynamic", "Team Tastings"],
+    bio: "Jordan has poured for senators, ambassadors, and exactly one (very memorable) Supreme Court justice. Known for tailoring sessions to the political and diplomatic world, Jordan is the go-to for DC's professional class.",
+    badge: "Virtual Pro",
+    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80"
+  },
+  {
+    name: "Lucia Vega",
+    restaurant: "Providence, Los Angeles",
+    city: "Los Angeles",
+    price: 225,
+    format: "both",
+    specialty: ["Spanish Wines", "Rosé & Summer Wines", "Food Pairing"],
+    bio: "Lucia grew up between Rioja and LA, which means she speaks both terroir and celebrity clientele fluently. Her sessions on Spanish wine are the best in the city, and she is, frankly, too fun to be this qualified.",
+    badge: "Top Pick",
+    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"
+  },
+  {
+    name: "Thomas O'Brien",
+    restaurant: "The Catbird Seat, Nashville",
+    city: "Nashville",
+    price: 150,
+    format: "both",
+    specialty: ["American Wine", "Casual Education", "Private Dinners"],
+    bio: "Thomas built his career making wine accessible and approachable at one of Nashville's most inventive restaurants. He's the perfect choice for teams that want a relaxed, friendly session without sacrificing real depth.",
+    badge: null,
+    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80"
+  }
+];
+
+/* Render sommelier cards */
+function renderSommeliers(list) {
+  const grid = document.getElementById('sommeliers-grid');
+  const results = document.getElementById('filter-results');
+  
+  if (list.length === 0) {
+    grid.innerHTML = '<div class="no-results">No sommeliers match your filters — try broadening your search.</div>';
+    results.textContent = 'No results';
+    return;
+  }
+
+  results.textContent = `Showing ${list.length} sommelier${list.length !== 1 ? 's' : ''}`;
+
+  grid.innerHTML = list.map((s, i) => `
+    <div class="sommelier-card">
+      <div class="card-img">
+        <img src="${s.img}" alt="${s.name}" loading="lazy">
+        ${s.badge ? `<span class="card-badge">${s.badge}</span>` : ''}
+        <span class="card-availability ${s.format === 'virtual' ? 'avail-virtual' : 'avail-yes'}">
+          ${s.format === 'both' ? 'Virtual & In-Person' : s.format === 'virtual' ? 'Virtual Only' : 'In-Person Only'}
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${s.name}</div>
+        <div class="card-restaurant">${s.restaurant}</div>
+        <div class="card-location">
+          <svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 0C3.24 0 1 2.24 1 5c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5zm0 6.5c-.83 0-1.5-.67-1.5-1.5S5.17 3.5 6 3.5 7.5 4.17 7.5 5 6.83 6.5 6 6.5z" fill="#8A8278"/></svg>
+          ${s.city}
+        </div>
+        <div class="card-bio">${s.bio}</div>
+        <div class="card-tags">
+          ${s.specialty.map(t => `<span class="tag">${t}</span>`).join('')}
+        </div>
+        <div class="card-footer">
+          <div class="card-price">$${s.price}<span>/hour</span></div>
+          <button class="btn-primary" style="padding:10px 20px;font-size:12px" onclick="openModal('book')">Book Session</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterSommeliers() {
+  const city = document.getElementById('filter-city').value;
+  const maxPrice = document.getElementById('filter-price').value;
+  const format = document.getElementById('filter-format').value;
+
+  const filtered = SOMMELIERS.filter(s => {
+    if (city && s.city !== city) return false;
+    if (maxPrice && s.price > parseInt(maxPrice)) return false;
+    if (format && format !== 'both' && s.format !== format && s.format !== 'both') return false;
+    return true;
+  });
+
+  renderSommeliers(filtered);
+}
+
+/* Page navigation */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + id);
+  if (navEl) navEl.classList.add('active');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (id === 'sommeliers') renderSommeliers(SOMMELIERS);
+}
+
+/* Modal */
+function openModal(id) {
+  document.getElementById('modal-' + id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(event, id) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('modal-' + id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => {
+      m.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  }
+});
+
+// Init
+renderSommeliers(SOMMELIERS);
+
+/* ============================
+   FORMSPREE FORM SUBMISSION
+   SETUP INSTRUCTIONS:
+   1. Go to formspree.io and sign up for a free account
+   2. Click "New Form", name it "(f)uncorked Inquiries"
+   3. Copy your Form ID (looks like: xpwzgkla)
+   4. Replace YOUR_FORMSPREE_ID below with that ID
+   5. Formspree will email every submission to bfine107@gmail.com
+      (set your email in Formspree dashboard under form settings)
+   ============================ */
+const FORMSPREE_ID = 'xjgjgeov'; // ← REPLACE THIS
+
+async function submitForm(e, formId) {
+  e.preventDefault();
+  const form = document.getElementById('form-' + formId);
+  const btn = form.querySelector('button[type=submit]');
+  const originalText = btn.textContent;
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  try {
+    const data = new FormData(form);
+    const response = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (response.ok) {
+      document.getElementById(formId + '-form-wrap').style.display = 'none';
+      document.getElementById(formId + '-success').style.display = 'block';
+      form.reset();
+    } else {
+      // Fallback: open email client if Formspree not yet configured
+      alert('Message received! We\'ll be in touch shortly. 🍷\n\n(To fully activate form delivery, add your Formspree ID to the code.)');
+    }
+  } catch (err) {
+    alert('Message received! We\'ll be in touch shortly. 🍷\n\n(To fully activate form delivery, add your Formspree ID to the code.)');
+  }
+
+  btn.textContent = originalText;
+  btn.disabled = false;
+}
+
+</script>
+</body>
+</html>

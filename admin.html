@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>(f)uncorked — Admin Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0F0D0A; --surface:#1A1712; --surface2:#231F1A;
+  --border:#2E2922; --border2:#3D3730;
+  --wine:#8B3350; --wine-glow:rgba(139,51,80,0.18); --wine-light:#A33D5F;
+  --gold:#C9A84C; --gold-dim:rgba(201,168,76,0.15);
+  --cream:#FAF7F2; --cream-dim:rgba(250,247,242,0.55); --cream-faint:rgba(250,247,242,0.06);
+  --green:#4A8C6F; --green-dim:rgba(74,140,111,0.15);
+  --red:#C05555; --red-dim:rgba(192,85,85,0.15);
+  --font-display:'Cormorant Garamond',serif; --font-body:'DM Sans',sans-serif; --font-mono:'DM Mono',monospace;
+  --sidebar:252px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--cream);font-family:var(--font-body);font-size:14px;font-weight:300;min-height:100vh;}
+
+/* ── LOGIN ────────────────────────── */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 50%,rgba(139,51,80,0.12) 0%,transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(201,168,76,0.06) 0%,transparent 60%),var(--bg);}
+.login-card{width:420px;background:var(--surface);border:1px solid var(--border);overflow:hidden;}
+.login-header{background:var(--wine);padding:40px 40px 32px;position:relative;overflow:hidden;}
+.login-header::after{content:'"';position:absolute;right:20px;bottom:-20px;font-family:var(--font-display);font-size:180px;color:rgba(255,255,255,0.05);line-height:1;}
+.login-logo{font-family:var(--font-display);font-size:32px;font-weight:300;color:var(--cream);margin-bottom:6px;}
+.login-logo em{font-style:italic;color:var(--gold);}
+.login-tagline{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,247,242,0.5);font-family:var(--font-mono);}
+.login-body{padding:36px 40px 40px;}
+.login-body h2{font-family:var(--font-display);font-size:22px;font-weight:400;margin-bottom:6px;}
+.login-body>p{font-size:13px;color:var(--cream-dim);margin-bottom:28px;line-height:1.5;}
+.login-roles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;}
+.role-btn{padding:12px 10px;border:1px solid var(--border);background:var(--surface2);color:var(--cream-dim);font-family:var(--font-body);font-size:12px;cursor:pointer;transition:all 0.2s;text-align:center;}
+.role-btn:hover{border-color:var(--border2);color:var(--cream);}
+.role-btn.selected{border-color:var(--wine);background:var(--wine-glow);color:var(--cream);}
+.role-icon{font-size:20px;display:block;margin-bottom:6px;}
+.role-name{font-weight:500;display:block;}
+.role-desc{font-size:10px;color:rgba(250,247,242,0.4);display:block;margin-top:2px;}
+.lf{margin-bottom:16px;}
+.lf label{display:block;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,247,242,0.4);margin-bottom:8px;}
+.lf input,.lf select{width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);color:var(--cream);font-family:var(--font-body);font-size:14px;outline:none;transition:border-color 0.2s;}
+.lf input:focus,.lf select:focus{border-color:var(--wine);}
+.lf input::placeholder{color:rgba(250,247,242,0.2);}
+.lf select option{background:var(--surface2);}
+.btn-login{width:100%;padding:14px;background:var(--wine);color:var(--cream);border:none;font-family:var(--font-body);font-size:13px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:8px;}
+.btn-login:hover{background:var(--wine-light);}
+.login-error{background:var(--red-dim);border:1px solid rgba(192,85,85,0.3);color:#E07070;padding:10px 14px;font-size:12px;margin-bottom:14px;display:none;}
+
+/* ── LAYOUT ────────────────────────── */
+#app{display:none;min-height:100vh;}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;overflow-y:auto;}
+.sidebar-logo{padding:24px 22px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.logo-mark{font-family:var(--font-display);font-size:20px;font-weight:300;color:var(--cream);display:block;margin-bottom:2px;}
+.logo-mark em{font-style:italic;color:var(--gold);}
+.logo-sub{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,247,242,0.3);font-family:var(--font-mono);}
+.sidebar-user{padding:14px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--wine);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:15px;color:var(--cream);flex-shrink:0;overflow:hidden;}
+.user-avatar img{width:100%;height:100%;object-fit:cover;}
+.user-name{font-size:13px;font-weight:500;color:var(--cream);}
+.user-role{font-size:10px;color:var(--gold);letter-spacing:0.04em;}
+.sidebar-nav{flex:1;padding:10px 0;}
+.nav-section-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(250,247,242,0.22);padding:10px 22px 4px;font-family:var(--font-mono);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 22px;cursor:pointer;color:var(--cream-dim);font-size:13px;transition:all 0.15s;user-select:none;}
+.nav-item:hover{background:var(--cream-faint);color:var(--cream);}
+.nav-item.active{background:var(--wine-glow);color:var(--cream);border-right:2px solid var(--wine);}
+.nav-item .icon{font-size:14px;width:16px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--wine);color:var(--cream);font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center;}
+.sidebar-footer{padding:14px 22px;border-top:1px solid var(--border);flex-shrink:0;}
+.sidebar-footer a{font-size:12px;color:rgba(250,247,242,0.3);text-decoration:none;display:block;margin-bottom:6px;cursor:pointer;transition:color 0.15s;}
+.sidebar-footer a:hover{color:var(--gold);}
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 36px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
+.topbar-title{font-family:var(--font-display);font-size:21px;font-weight:300;color:var(--cream);}
+.topbar-title em{font-style:italic;color:var(--gold);}
+.topbar-actions{display:flex;gap:10px;align-items:center;}
+.page-content{padding:32px 36px;flex:1;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── COMPONENTS ────────────────────────── */
+.btn{padding:8px 18px;font-family:var(--font-body);font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-wine{background:var(--wine);color:var(--cream);}
+.btn-wine:hover{background:var(--wine-light);}
+.btn-outline{background:transparent;color:var(--cream-dim);border:1px solid var(--border2);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-ghost{background:transparent;color:var(--cream-dim);border:1px solid var(--border);padding:6px 12px;font-size:11px;}
+.btn-ghost:hover{border-color:var(--border2);color:var(--cream);}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(192,85,85,0.3);padding:6px 12px;font-size:11px;}
+.btn-danger:hover{border-color:var(--red);background:var(--red-dim);}
+.btn-sm{padding:6px 14px;font-size:11px;}
+.btn-green{background:var(--green);color:var(--cream);}
+.btn-green:hover{background:#3a7a5e;}
+.card{background:var(--surface);border:1px solid var(--border);}
+.card-header{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:var(--font-display);font-size:17px;font-weight:400;color:var(--cream);}
+.card-body{padding:22px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:rgba(250,247,242,0.38);margin-bottom:7px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 13px;background:var(--surface2);border:1px solid var(--border);color:var(--cream);font-family:var(--font-body);font-size:13px;font-weight:300;outline:none;transition:border-color 0.2s;}
+.field textarea{resize:vertical;height:90px;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--wine);}
+.field input::placeholder,.field textarea::placeholder{color:rgba(250,247,242,0.2);}
+.field select option{background:var(--surface2);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.status-pill{font-size:10px;letter-spacing:0.06em;text-transform:uppercase;padding:3px 9px;font-weight:500;}
+.pill-confirmed{background:var(--green-dim);color:var(--green);}
+.pill-pending{background:var(--gold-dim);color:var(--gold);}
+.pill-new{background:var(--wine-glow);color:#D47090;}
+.pill-read{background:rgba(250,247,242,0.06);color:rgba(250,247,242,0.4);}
+.pill-replied{background:var(--green-dim);color:var(--green);}
+.toast{position:fixed;bottom:28px;right:28px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);padding:13px 18px;font-size:13px;color:var(--cream);z-index:999;transform:translateY(70px);opacity:0;transition:all 0.3s;pointer-events:none;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.divider-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(250,247,242,0.28);font-family:var(--font-mono);padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:18px;margin-top:24px;}
+.divider-label:first-child{margin-top:0;}
+
+/* ── STATS ────────────────────────── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:22px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.stat-card.c-wine::before{background:var(--wine);}
+.stat-card.c-gold::before{background:var(--gold);}
+.stat-card.c-green::before{background:var(--green);}
+.stat-card.c-dim::before{background:var(--border2);}
+.stat-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(250,247,242,0.32);margin-bottom:8px;font-family:var(--font-mono);}
+.stat-value{font-family:var(--font-display);font-size:38px;font-weight:300;color:var(--cream);line-height:1;margin-bottom:6px;}
+.stat-sub{font-size:12px;color:rgba(250,247,242,0.38);}
+.up{color:var(--green);}
+
+/* ── INQUIRIES ────────────────────────── */
+.inquiry-row{display:grid;grid-template-columns:8px 1fr auto auto auto;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--border);transition:background 0.15s;}
+.inquiry-row:hover{background:var(--cream-faint);}
+.inquiry-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-new{background:var(--wine);}
+.dot-read{background:var(--border2);}
+.dot-replied{background:var(--green);}
+.inquiry-name{font-size:13px;font-weight:500;color:var(--cream);}
+.inquiry-meta{font-size:11px;color:rgba(250,247,242,0.38);margin-top:2px;}
+.inquiry-time{font-size:11px;color:rgba(250,247,242,0.35);font-family:var(--font-mono);white-space:nowrap;}
+
+/* ── MODAL ────────────────────────── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,13,10,0.82);z-index:200;align-items:center;justify-content:center;padding:32px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);max-width:640px;width:100%;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-header{padding:22px 28px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;}
+.modal-header h2{font-family:var(--font-display);font-size:22px;font-weight:400;}
+.modal-close{background:none;border:none;color:rgba(250,247,242,0.4);font-size:22px;cursor:pointer;line-height:1;padding:0;}
+.modal-close:hover{color:var(--cream);}
+.modal-body{padding:22px 28px;}
+
+/* ── SOMMELIER GRID ────────────────────────── */
+.som-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.som-card{background:var(--surface);border:1px solid var(--border);overflow:hidden;transition:border-color 0.2s;}
+.som-card:hover{border-color:var(--border2);}
+.som-card-img{height:160px;background:var(--surface2);overflow:hidden;}
+.som-card-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.som-card-body{padding:16px;}
+.som-card-name{font-family:var(--font-display);font-size:18px;font-weight:400;margin-bottom:2px;}
+.som-card-rest{font-size:11px;color:var(--gold);letter-spacing:0.04em;margin-bottom:8px;}
+.som-card-meta{font-size:12px;color:var(--cream-dim);margin-bottom:12px;}
+.som-card-footer{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);}
+
+/* ── PROFILE EDITOR ────────────────────────── */
+.profile-layout{display:grid;grid-template-columns:260px 1fr;gap:22px;}
+.preview-card{background:var(--surface);border:1px solid var(--border);overflow:hidden;position:sticky;top:78px;align-self:start;}
+.preview-img-wrap{height:180px;background:var(--surface2);overflow:hidden;position:relative;}
+.preview-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.preview-body{padding:18px;}
+.preview-name{font-family:var(--font-display);font-size:19px;font-weight:400;margin-bottom:3px;}
+.preview-rest{font-size:11px;color:var(--gold);letter-spacing:0.04em;margin-bottom:10px;}
+.preview-bio{font-size:12px;color:var(--cream-dim);line-height:1.55;margin-bottom:12px;}
+.preview-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;}
+.preview-tag{font-size:10px;padding:3px 8px;border:1px solid var(--border2);color:rgba(250,247,242,0.45);}
+.preview-price{font-family:var(--font-display);font-size:22px;color:var(--wine);}
+.preview-price span{font-family:var(--font-body);font-size:11px;color:rgba(250,247,242,0.3);}
+.spec-tag-editor{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+.spec-tag{display:flex;align-items:center;gap:5px;background:var(--wine-glow);border:1px solid rgba(139,51,80,0.4);color:var(--cream);padding:4px 9px;font-size:12px;}
+.spec-tag button{background:none;border:none;color:rgba(250,247,242,0.4);cursor:pointer;font-size:14px;line-height:1;transition:color 0.15s;}
+.spec-tag button:hover{color:var(--red);}
+.add-tag-row{display:flex;gap:8px;}
+.add-tag-input{flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);color:var(--cream);font-family:var(--font-body);font-size:13px;outline:none;transition:border-color 0.2s;}
+.add-tag-input:focus{border-color:var(--wine);}
+.add-tag-input::placeholder{color:rgba(250,247,242,0.2);}
+
+/* ── PHOTO UPLOAD ────────────────────────── */
+.photo-upload-area{position:relative;border:2px dashed var(--border2);background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;cursor:pointer;transition:border-color 0.2s;margin-bottom:8px;}
+.photo-upload-area:hover{border-color:var(--wine);}
+.photo-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.photo-upload-thumb{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border2);}
+.photo-upload-label{font-size:12px;color:var(--cream-dim);text-align:center;line-height:1.4;}
+.photo-upload-label strong{color:var(--gold);font-weight:500;}
+
+/* ── RATES & PACKAGES ────────────────────────── */
+.rate-card{background:var(--surface);border:1px solid var(--border);padding:24px;}
+.rate-card-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(250,247,242,0.35);font-family:var(--font-mono);margin-bottom:12px;}
+.rate-input-wrap{display:flex;align-items:stretch;}
+.rate-prefix{background:var(--surface2);border:1px solid var(--border);border-right:none;padding:10px 12px;color:rgba(250,247,242,0.35);font-size:16px;font-family:var(--font-display);}
+.rate-input{flex:1;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);color:var(--cream);font-family:var(--font-display);font-size:28px;font-weight:300;outline:none;transition:border-color 0.2s;-moz-appearance:textfield;}
+.rate-input::-webkit-outer-spin-button,.rate-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.rate-input:focus{border-color:var(--wine);}
+.rate-suffix{background:var(--surface2);border:1px solid var(--border);border-left:none;padding:10px 12px;color:rgba(250,247,242,0.35);font-size:12px;display:flex;align-items:center;}
+.rate-note{font-size:12px;color:rgba(250,247,242,0.3);margin-top:8px;}
+.pkg-item{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:16px;padding:16px 22px;border-bottom:1px solid var(--border);transition:background 0.15s;}
+.pkg-item:hover{background:var(--cream-faint);}
+.pkg-item:last-child{border-bottom:none;}
+.pkg-name{font-size:14px;font-weight:500;margin-bottom:3px;}
+.pkg-desc{font-size:12px;color:rgba(250,247,242,0.4);}
+.pkg-price{font-family:var(--font-display);font-size:22px;color:var(--gold);white-space:nowrap;}
+.export-note{background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);padding:14px 18px;font-size:12px;color:var(--gold);line-height:1.6;margin-top:20px;}
+.export-note strong{font-weight:500;}
+.code-box{background:var(--bg);border:1px solid var(--border);padding:12px 16px;font-family:var(--font-mono);font-size:11px;color:rgba(250,247,242,0.6);white-space:pre-wrap;word-break:break-all;margin-top:8px;max-height:200px;overflow-y:auto;}
+
+/* ── BOOKINGS ────────────────────────── */
+.booking-row{display:grid;grid-template-columns:8px 1fr auto auto auto;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--border);transition:background 0.15s;}
+.booking-row:hover{background:var(--cream-faint);}
+.booking-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-confirmed{background:var(--green);}
+.dot-pending{background:var(--gold);}
+.dot-completed{background:var(--border2);}
+.booking-name{font-size:13px;font-weight:500;color:var(--cream);}
+.booking-meta{font-size:11px;color:rgba(250,247,242,0.38);margin-top:2px;}
+.booking-date{font-size:11px;color:var(--cream-dim);font-family:var(--font-mono);white-space:nowrap;}
+
+/* ── MESSAGES ────────────────────────── */
+.messages-layout{display:grid;grid-template-columns:280px 1fr;border:1px solid var(--border);height:calc(100vh - 200px);min-height:500px;}
+.msg-list{border-right:1px solid var(--border);overflow-y:auto;background:var(--surface);display:flex;flex-direction:column;}
+.msg-search{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.msg-search input{width:100%;background:var(--surface2);border:1px solid var(--border);padding:8px 12px;color:var(--cream);font-family:var(--font-body);font-size:13px;outline:none;}
+.msg-search input::placeholder{color:rgba(250,247,242,0.2);}
+.msg-thread{padding:13px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s;}
+.msg-thread:hover{background:var(--cream-faint);}
+.msg-thread.active{background:var(--wine-glow);border-right:2px solid var(--wine);}
+.thread-name{font-size:13px;font-weight:500;color:var(--cream);display:flex;justify-content:space-between;margin-bottom:4px;}
+.thread-time{font-size:10px;color:rgba(250,247,242,0.3);font-family:var(--font-mono);}
+.thread-preview{font-size:12px;color:rgba(250,247,242,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.thread-unread{width:7px;height:7px;border-radius:50%;background:var(--wine);flex-shrink:0;margin-top:3px;}
+.msg-detail{display:flex;flex-direction:column;background:var(--bg);}
+.msg-detail-header{padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.detail-name{font-family:var(--font-display);font-size:18px;font-weight:400;}
+.detail-sub{font-size:12px;color:rgba(250,247,242,0.4);margin-top:2px;}
+.msg-body{flex:1;padding:22px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
+.msg-bubble{max-width:72%;}
+.msg-bubble.from{align-self:flex-start;}
+.msg-bubble.to{align-self:flex-end;}
+.bubble-text{padding:11px 15px;font-size:13px;line-height:1.55;}
+.msg-bubble.from .bubble-text{background:var(--surface);border:1px solid var(--border);color:var(--cream);}
+.msg-bubble.to .bubble-text{background:var(--wine);color:var(--cream);}
+.bubble-meta{font-size:10px;color:rgba(250,247,242,0.3);margin-top:4px;font-family:var(--font-mono);}
+.msg-bubble.to .bubble-meta{text-align:right;}
+.msg-compose{padding:14px 22px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:10px;align-items:flex-end;flex-shrink:0;}
+.compose-input{flex:1;background:var(--surface2);border:1px solid var(--border);padding:10px 13px;color:var(--cream);font-family:var(--font-body);font-size:13px;outline:none;resize:none;min-height:40px;max-height:120px;transition:border-color 0.2s;}
+.compose-input:focus{border-color:var(--wine);}
+.compose-input::placeholder{color:rgba(250,247,242,0.2);}
+.compose-meta{font-size:11px;color:rgba(250,247,242,0.3);margin-bottom:10px;}
+
+/* ── PIN MANAGEMENT ────────────────────────── */
+.pin-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;}
+.pin-label{font-size:13px;color:var(--cream);}
+.pin-value{font-family:var(--font-mono);font-size:13px;color:var(--gold);letter-spacing:0.1em;}
+
+/* ── CALENDAR ────────────────────────── */
+.cal-layout{display:grid;grid-template-columns:1fr 260px;gap:18px;}
+.cal-month{font-family:var(--font-display);font-size:21px;font-weight:300;min-width:170px;}
+.cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.cal-nav-btn{background:var(--surface2);border:1px solid var(--border);color:var(--cream-dim);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all 0.15s;}
+.cal-nav-btn:hover{border-color:var(--border2);color:var(--cream);}
+.cal-grid{background:var(--surface);border:1px solid var(--border);}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);}
+.cal-weekday{padding:9px;text-align:center;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,247,242,0.28);font-family:var(--font-mono);}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-day{min-height:78px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:7px;cursor:pointer;transition:background 0.15s;}
+.cal-day:hover{background:var(--cream-faint);}
+.cal-day:nth-child(7n){border-right:none;}
+.cal-day.other-month .day-num{opacity:0.2;}
+.cal-day.today{background:var(--wine-glow);}
+.cal-day.today .day-num{color:var(--wine);font-weight:500;}
+.day-num{font-size:11px;color:var(--cream-dim);margin-bottom:5px;font-family:var(--font-mono);}
+.cal-event{font-size:10px;padding:2px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.event-booked{background:var(--wine-glow);color:#D47090;border-left:2px solid var(--wine);}
+.event-virtual{background:var(--gold-dim);color:var(--gold);border-left:2px solid var(--gold);}
+.event-blocked{background:rgba(250,247,242,0.04);color:rgba(250,247,242,0.28);border-left:2px solid var(--border2);}
+.toggle{position:relative;width:36px;height:20px;cursor:pointer;}
+.toggle input{display:none;}
+.toggle-track{position:absolute;inset:0;background:var(--border2);border-radius:10px;transition:background 0.2s;}
+.toggle input:checked + .toggle-track{background:var(--green);}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;background:white;border-radius:50%;transition:left 0.2s;}
+.toggle input:checked ~ .toggle-thumb{left:19px;}
+.avail-row{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border);}
+.avail-row:last-child{border-bottom:none;}
+.avail-day{font-size:13px;color:var(--cream-dim);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo"><em>(f)</em>uncorked</div>
+      <div class="login-tagline">Admin Portal</div>
+    </div>
+    <div class="login-body">
+      <h2>Welcome back.</h2>
+      <p>Sign in to manage your sommeliers, review inquiries, and keep the operation running smoothly.</p>
+      <div class="login-error" id="login-error">Incorrect PIN. Please try again.</div>
+      <div class="login-roles">
+        <button class="role-btn selected" onclick="selectRole('owner',this)"><span class="role-icon">◈</span><span class="role-name">Owner</span><span class="role-desc">Full access</span></button>
+        <button class="role-btn" onclick="selectRole('sommelier',this)"><span class="role-icon">◎</span><span class="role-name">Sommelier</span><span class="role-desc">My profile only</span></button>
+      </div>
+      <div class="lf" id="som-select-wrap" style="display:none">
+        <label>Select Your Name</label>
+        <select id="login-som-select"><option value="">Choose your profile...</option></select>
+      </div>
+      <div class="lf">
+        <label id="pin-label">Owner PIN</label>
+        <input type="password" id="login-pin" placeholder="Enter your PIN" maxlength="8" onkeydown="if(event.key==='Enter')attemptLogin()">
+      </div>
+      <button class="btn-login" onclick="attemptLogin()">Sign In →</button>
+      <p style="font-size:11px;color:rgba(250,247,242,0.22);margin-top:18px;text-align:center;font-family:var(--font-mono)">Demo: Owner PIN = 1234 · Sommelier PIN = 5678</p>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-mark"><em>(f)</em>uncorked</span>
+      <span class="logo-sub">Admin Portal</span>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar">B</div>
+      <div>
+        <div class="user-name" id="sidebar-name">Owner</div>
+        <div class="user-role" id="sidebar-role">Full Access</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <a onclick="window.open('index.html')">← View Public Site</a>
+      <a onclick="doLogout()">Sign Out</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-actions" id="topbar-actions"></div>
+    </div>
+    <div class="page-content">
+
+      <!-- DASHBOARD -->
+      <div id="panel-dashboard" class="panel">
+        <div class="stats-row">
+          <div class="stat-card c-wine"><div class="stat-label">New Inquiries</div><div class="stat-value" id="stat-inquiries">0</div><div class="stat-sub">Awaiting response</div></div>
+          <div class="stat-card c-gold"><div class="stat-label">Active Sommeliers</div><div class="stat-value" id="stat-sommeliers">0</div><div class="stat-sub">On the platform</div></div>
+          <div class="stat-card c-green"><div class="stat-label">Sessions This Month</div><div class="stat-value">14</div><div class="stat-sub"><span class="up">↑ 18%</span> vs last month</div></div>
+          <div class="stat-card c-dim"><div class="stat-label">Profile Views</div><div class="stat-value">312</div><div class="stat-sub"><span class="up">↑ 34%</span> this week</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div>
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-header"><span class="card-title">Recent Inquiries</span><button class="btn btn-outline btn-sm" onclick="showPanel('inquiries')">View All</button></div>
+              <div id="dash-inquiries"></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">Recent Bookings</span><button class="btn btn-outline btn-sm" onclick="showPanel('bookings')">View All</button></div>
+              <div id="dash-bookings"></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-header"><span class="card-title">Your Sommeliers</span><button class="btn btn-wine btn-sm" onclick="openAddSommelier()">+ Add</button></div>
+              <div id="dash-som-list"></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">Quick Actions</span></div>
+              <div class="card-body" style="display:flex;flex-direction:column;gap:9px">
+                <button class="btn btn-wine" style="width:100%;justify-content:flex-start" onclick="showPanel('sommeliers-list')">+ Add New Sommelier</button>
+                <button class="btn btn-outline" style="width:100%;justify-content:flex-start" onclick="showPanel('inquiries')">Review Inquiries</button>
+                <button class="btn btn-outline" style="width:100%;justify-content:flex-start" onclick="showPanel('rates')">Manage Rates &amp; Packages</button>
+                <button class="btn btn-outline" style="width:100%;justify-content:flex-start" onclick="showPanel('pins')">Manage Login PINs</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INQUIRIES -->
+      <div id="panel-inquiries" class="panel">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">All Inquiries</span>
+            <span style="font-size:12px;color:rgba(250,247,242,0.35)">Auto-emailed to <span style="color:var(--gold)">bfine107@gmail.com</span> via Formspree</span>
+          </div>
+          <div id="inquiry-list"></div>
+          <div style="padding:14px 22px;border-top:1px solid var(--border)">
+            <p style="font-size:12px;color:rgba(250,247,242,0.32);line-height:1.6">✅ Formspree endpoint <strong style="color:var(--gold)">xjgjgeov</strong> is active. Every inquiry from the public site goes to <strong>bfine107@gmail.com</strong> automatically.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOKINGS -->
+      <div id="panel-bookings" class="panel">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Bookings</span>
+            <button class="btn btn-wine btn-sm" onclick="openAddBookingModal()">+ Add Booking</button>
+          </div>
+          <div id="booking-list"></div>
+        </div>
+        <p style="font-size:12px;color:rgba(250,247,242,0.28);margin-top:14px;line-height:1.6">Bookings you add here are stored locally. When connected to a backend or booking platform (e.g. Calendly, TidyCal), they can sync automatically.</p>
+      </div>
+
+      <!-- MESSAGES -->
+      <div id="panel-messages" class="panel">
+        <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+          <p style="font-size:13px;color:var(--cream-dim)" id="msg-email-note"></p>
+          <button class="btn btn-outline btn-sm" onclick="showPanel('profile-editor')">Set My Email →</button>
+        </div>
+        <div class="messages-layout">
+          <div class="msg-list">
+            <div class="msg-search"><input type="text" placeholder="Search messages..." oninput="filterThreads(this.value)"></div>
+            <div id="thread-list"></div>
+          </div>
+          <div class="msg-detail" id="msg-detail">
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;color:rgba(250,247,242,0.25);font-family:var(--font-display);font-size:20px;font-style:italic">Select a conversation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOMMELIERS LIST -->
+      <div id="panel-sommeliers-list" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div><h2 style="font-family:var(--font-display);font-size:24px;font-weight:300;margin-bottom:4px">Manage Sommeliers</h2><p style="font-size:13px;color:var(--cream-dim)">Add, edit, or remove profiles. Changes export as code to paste into index.html.</p></div>
+          <button class="btn btn-wine" onclick="openAddSommelier()">+ Add Sommelier</button>
+        </div>
+        <div class="som-grid" id="owner-som-grid"></div>
+      </div>
+
+      <!-- PROFILE EDITOR -->
+      <div id="panel-profile-editor" class="panel">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px">
+          <button class="btn btn-outline btn-sm" id="back-btn" onclick="showPanel('sommeliers-list')" style="display:none">← Back</button>
+          <h2 style="font-family:var(--font-display);font-size:22px;font-weight:300" id="editor-title">Edit Profile</h2>
+        </div>
+        <div class="profile-layout">
+          <!-- LIVE PREVIEW -->
+          <div>
+            <div class="preview-card">
+              <div class="preview-img-wrap"><img id="preview-img" src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&q=80" alt=""></div>
+              <div class="preview-body">
+                <div class="preview-name" id="preview-name">Name</div>
+                <div class="preview-rest" id="preview-rest">Restaurant</div>
+                <div class="preview-bio" id="preview-bio">Bio preview...</div>
+                <div class="preview-tags" id="preview-tags"></div>
+                <div class="preview-price" id="preview-price">$0<span>/hour</span></div>
+              </div>
+            </div>
+            <p style="font-size:10px;color:rgba(250,247,242,0.2);margin-top:10px;text-align:center;font-family:var(--font-mono)">Live card preview</p>
+          </div>
+          <!-- FORM -->
+          <div>
+            <div class="divider-label">Photo</div>
+            <!-- PHOTO UPLOAD -->
+            <div class="photo-upload-area" id="photo-drop-area">
+              <input type="file" accept="image/*" id="photo-file-input" onchange="handlePhotoUpload(this)">
+              <img id="photo-thumb" class="photo-upload-thumb" src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&q=80" alt="">
+              <div class="photo-upload-label">
+                <strong>Click to upload</strong> or drag & drop<br>
+                JPG, PNG, WEBP · Max 4MB
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:16px">
+              <div class="field" style="flex:1;margin-bottom:0"><label>Or paste an image URL</label><input type="url" id="ef-img-url" placeholder="https://..." oninput="applyImgUrl(this.value)"></div>
+            </div>
+
+            <div class="divider-label">Basic Information</div>
+            <div class="field-row">
+              <div class="field"><label>First Name</label><input type="text" id="ef-first" oninput="livePreview()" placeholder="Elena"></div>
+              <div class="field"><label>Last Name</label><input type="text" id="ef-last" oninput="livePreview()" placeholder="Marchetti"></div>
+            </div>
+            <div class="field"><label>Restaurant / Affiliation</label><input type="text" id="ef-restaurant" oninput="livePreview()" placeholder="Per Se, New York"></div>
+            <div class="field-row">
+              <div class="field"><label>City</label>
+                <select id="ef-city"><option>New York</option><option>Los Angeles</option><option>Chicago</option><option>San Francisco</option><option>Washington DC</option><option>Nashville</option><option>Miami</option><option>Boston</option><option>Other</option></select>
+              </div>
+              <div class="field"><label>Certification</label>
+                <select id="ef-cert"><option>Certified Sommelier</option><option>Advanced Sommelier</option><option>Master Sommelier</option><option>WSET Level 3</option><option>WSET Level 4 Diploma</option></select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field"><label>Format</label>
+                <select id="ef-format"><option value="both">Both (Virtual &amp; In-Person)</option><option value="in-person">In-Person Only</option><option value="virtual">Virtual Only</option></select>
+              </div>
+              <div class="field"><label>Hourly Rate ($)</label><input type="number" id="ef-price" placeholder="250" min="75" oninput="livePreview()"></div>
+            </div>
+
+            <div class="divider-label">Bio</div>
+            <div class="field"><label>Short Bio (shown on card)</label><textarea id="ef-bio" oninput="livePreview()" placeholder="A warm, compelling description..."></textarea></div>
+
+            <div class="divider-label">Specialties</div>
+            <div class="spec-tag-editor" id="ef-tags-wrap"></div>
+            <div class="add-tag-row">
+              <input class="add-tag-input" type="text" id="ef-new-tag" placeholder="Add a specialty..." onkeydown="if(event.key==='Enter')editorAddTag()">
+              <button class="btn btn-outline btn-sm" onclick="editorAddTag()">+ Add</button>
+            </div>
+
+            <div id="owner-only-fields">
+              <div class="divider-label">Account</div>
+              <div class="field-row">
+                <div class="field"><label>Login PIN (4–8 digits)</label><input type="text" id="ef-pin" placeholder="e.g. 5678" maxlength="8"></div>
+                <div class="field"><label>Notification Email</label><input type="email" id="ef-email" placeholder="sommelier@email.com"></div>
+              </div>
+            </div>
+
+            <div id="som-email-field" style="display:none">
+              <div class="divider-label">My Notification Email</div>
+              <div class="field"><label>Email (messages sent from portal will CC this address)</label><input type="email" id="ef-email-som" placeholder="your@email.com"></div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:24px">
+              <button class="btn btn-wine" style="flex:1;justify-content:center" onclick="saveProfile()">Save Profile</button>
+              <button class="btn btn-danger" id="delete-btn" onclick="deleteProfile()" style="display:none">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RATES & PACKAGES -->
+      <div id="panel-rates" class="panel">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div class="rate-card">
+            <div class="rate-card-label">Minimum Hourly Rate</div>
+            <div class="rate-input-wrap"><span class="rate-prefix">$</span><input class="rate-input" type="number" id="rate-min" value="75" min="0"><span class="rate-suffix">/hr</span></div>
+            <div class="rate-note">Platform floor — no sommelier can go below this</div>
+          </div>
+          <div class="rate-card">
+            <div class="rate-card-label">Maximum Hourly Rate</div>
+            <div class="rate-input-wrap"><span class="rate-prefix">$</span><input class="rate-input" type="number" id="rate-max" value="500" min="0"><span class="rate-suffix">/hr</span></div>
+            <div class="rate-note">Shown in the public site filter</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header"><span class="card-title">Featured Packages</span><button class="btn btn-wine btn-sm" onclick="openPkgModal()">+ Add Package</button></div>
+          <div id="pkg-list"></div>
+        </div>
+
+        <div class="export-note">
+          <strong>📋 How changes reflect on the public site:</strong><br>
+          The public site (index.html) is separate from this admin. After editing rates or packages, click "Export Code" below and paste the result into index.html to update the public site. Search for <code style="font-family:var(--font-mono)">SOMMELIER DATA</code> to find the right place.
+          <div style="margin-top:10px;display:flex;gap:10px">
+            <button class="btn btn-outline btn-sm" onclick="exportSommelierCode()">📋 Export Sommelier Code</button>
+            <button class="btn btn-outline btn-sm" onclick="saveRates()">Save Rate Limits</button>
+          </div>
+          <div id="export-code-box" style="display:none">
+            <div class="code-box" id="export-code"></div>
+            <button class="btn btn-ghost" style="margin-top:8px" onclick="copyExport()">Copy to Clipboard</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALENDAR -->
+      <div id="panel-calendar" class="panel">
+        <div class="cal-layout">
+          <div>
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+              <div class="cal-month" id="cal-month-label"></div>
+              <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+              <div style="display:flex;gap:8px;font-size:11px;color:rgba(250,247,242,0.4);margin-left:auto">
+                <span style="padding:2px 8px;background:var(--wine-glow);color:#D47090">● Booked</span>
+                <span style="padding:2px 8px;background:var(--gold-dim);color:var(--gold)">● Virtual</span>
+                <span style="padding:2px 8px;background:rgba(250,247,242,0.04);color:rgba(250,247,242,0.3)">● Blocked</span>
+              </div>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-weekdays"><div class="cal-weekday">Sun</div><div class="cal-weekday">Mon</div><div class="cal-weekday">Tue</div><div class="cal-weekday">Wed</div><div class="cal-weekday">Thu</div><div class="cal-weekday">Fri</div><div class="cal-weekday">Sat</div></div>
+              <div class="cal-days" id="cal-days"></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:14px">
+              <div class="card-header"><span class="card-title">Weekly Availability</span></div>
+              <div id="avail-toggles"></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">Format</span></div>
+              <div>
+                <div class="avail-row"><span class="avail-day">In-Person</span><label class="toggle"><input type="checkbox" checked onchange="showToast('Saved!')"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+                <div class="avail-row"><span class="avail-day">Virtual</span><label class="toggle"><input type="checkbox" checked onchange="showToast('Saved!')"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MY RATES (sommelier view) -->
+      <div id="panel-my-rates" class="panel">
+        <div class="card" style="max-width:480px">
+          <div class="card-header"><span class="card-title">My Rates</span></div>
+          <div class="card-body">
+            <div class="field"><label>My Hourly Rate</label><div style="display:flex"><span style="background:var(--surface2);border:1px solid var(--border);border-right:none;padding:9px 12px;color:rgba(250,247,242,0.35);font-size:15px">$</span><input type="number" id="my-rate" placeholder="250"></div></div>
+            <div class="field"><label>Travel Fee (outside city, flat)</label><div style="display:flex"><span style="background:var(--surface2);border:1px solid var(--border);border-right:none;padding:9px 12px;color:rgba(250,247,242,0.35);font-size:15px">$</span><input type="number" placeholder="150"></div></div>
+            <div class="field"><label>Virtual Wine Kit Curation (per person)</label><div style="display:flex"><span style="background:var(--surface2);border:1px solid var(--border);border-right:none;padding:9px 12px;color:rgba(250,247,242,0.35);font-size:15px">$</span><input type="number" placeholder="75"></div></div>
+            <button class="btn btn-wine" style="width:100%;justify-content:center;margin-top:8px" onclick="showToast('Rates saved ✓')">Save Rates</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PINS -->
+      <div id="panel-pins" class="panel">
+        <div class="card" style="max-width:520px">
+          <div class="card-header"><span class="card-title">Login PINs</span><span style="font-size:12px;color:rgba(250,247,242,0.35)">Share privately with each sommelier</span></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--cream-dim);margin-bottom:20px;line-height:1.6">Each sommelier uses their PIN to access only their profile. To change a PIN, edit their profile and save. Change the Owner PIN by editing <code style="font-family:var(--font-mono);color:var(--gold)">OWNER_PIN</code> in admin.html.</p>
+            <div class="pin-row" style="background:var(--wine-glow);border-color:rgba(139,51,80,0.4)"><span class="pin-label">Owner (You)</span><span class="pin-value">Edit OWNER_PIN in code</span></div>
+            <div id="pin-list"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- INQUIRY DETAIL MODAL -->
+<div class="modal-overlay" id="inquiry-modal" onclick="closeModal('inquiry-modal',event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><div><h2 id="inq-modal-name">Inquiry</h2><div style="font-size:12px;color:rgba(250,247,242,0.4);margin-top:4px" id="inq-modal-meta"></div></div><button class="modal-close" onclick="closeModal('inquiry-modal')">✕</button></div>
+    <div class="modal-body" id="inq-modal-body"></div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="booking-modal" onclick="closeModal('booking-modal',event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h2>Add Booking</h2><button class="modal-close" onclick="closeModal('booking-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field"><label>Client / Company</label><input type="text" id="bk-client" placeholder="Latham & Watkins"></div>
+        <div class="field"><label>Sommelier</label><select id="bk-sommelier"></select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Date</label><input type="date" id="bk-date"></div>
+        <div class="field"><label>Time</label><input type="time" id="bk-time"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Class / Format</label><input type="text" id="bk-class" placeholder="Wine List 101 · In-Person"></div>
+        <div class="field"><label>Status</label><select id="bk-status"><option value="confirmed">Confirmed</option><option value="pending">Pending</option><option value="completed">Completed</option></select></div>
+      </div>
+      <div class="field"><label>Notes</label><textarea id="bk-notes" style="height:70px" placeholder="Any details..."></textarea></div>
+      <button class="btn btn-wine" style="width:100%;justify-content:center" onclick="saveBooking()">Add Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- PACKAGE MODAL -->
+<div class="modal-overlay" id="pkg-modal" onclick="closeModal('pkg-modal',event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h2 id="pkg-modal-title">Add Package</h2><button class="modal-close" onclick="closeModal('pkg-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Package Name</label><input type="text" id="pkg-name" placeholder="Lunch & Learn"></div>
+      <div class="field"><label>Description</label><textarea id="pkg-desc" style="height:70px" placeholder="60 min · Up to 15 people · Virtual or In-Person"></textarea></div>
+      <div class="field-row">
+        <div class="field"><label>Price ($)</label><input type="number" id="pkg-price" placeholder="350"></div>
+        <div class="field"><label>Duration</label><input type="text" id="pkg-duration" placeholder="1.5 hrs"></div>
+      </div>
+      <button class="btn btn-wine" style="width:100%;justify-content:center" onclick="savePkg()">Save Package</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   EASY EDIT: Change owner PIN here
+   ═══════════════════════════════════════════ */
+const OWNER_PIN = '1234';
+
+/* ═══════════════════════════════════════════
+   DATA (saved to localStorage)
+   ═══════════════════════════════════════════ */
+let SOMMELIERS = JSON.parse(localStorage.getItem('fu_som') || 'null') || [
+  {id:'s1',name:'Elena Marchetti',restaurant:'Per Se, New York',city:'New York',price:250,format:'both',specialty:['Burgundy','Italian Wines','Elegant Pairings'],bio:"Elena spent eight years at the wine program at Per Se and holds an Advanced Sommelier certification. She has an infectious enthusiasm for Burgundy and a gift for making complex topics feel like good gossip.",badge:'Top Pick',img:'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&q=80',pin:'5678',email:'elena@example.com'},
+  {id:'s2',name:'Marcus Webb',restaurant:'Alinea, Chicago',city:'Chicago',price:200,format:'both',specialty:['Natural Wine','Sommelier Confidence','Blind Tasting'],bio:"Marcus led the wine program at Alinea for five years before launching his consulting practice. His classes are funny, fast-paced, and unusually practical.",badge:'Fan Favorite',img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',pin:'2345',email:''},
+  {id:'s3',name:'Simone Laurent',restaurant:'Quince, San Francisco',city:'San Francisco',price:300,format:'in-person',specialty:['Champagne','Rhône Valley','Wine Investment'],bio:"A Master Sommelier candidate with a background in French dining rooms. Simone's sessions are immersive, polished, and occasionally opinionated.",badge:'MS Candidate',img:'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',pin:'3456',email:''},
+  {id:'s4',name:'Jordan Patel',restaurant:'Minibar, Washington DC',city:'Washington DC',price:175,format:'virtual',specialty:['New World Wines','Organic & Biodynamic','Team Tastings'],bio:"Jordan has poured for senators, ambassadors, and exactly one very memorable Supreme Court justice.",badge:'Virtual Pro',img:'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80',pin:'4567',email:''},
+  {id:'s5',name:'Lucia Vega',restaurant:'Providence, Los Angeles',city:'Los Angeles',price:225,format:'both',specialty:['Spanish Wines','Rosé & Summer Wines','Food Pairing'],bio:"Lucia grew up between Rioja and LA, which means she speaks both terroir and celebrity clientele fluently.",badge:'Top Pick',img:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80',pin:'6789',email:''},
+  {id:'s6',name:"Thomas O'Brien",restaurant:'The Catbird Seat, Nashville',city:'Nashville',price:150,format:'both',specialty:['American Wine','Casual Education','Private Dinners'],bio:"Thomas built his career making wine accessible at one of Nashville's most inventive restaurants.",badge:null,img:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80',pin:'7890',email:''},
+];
+
+let INQUIRIES = JSON.parse(localStorage.getItem('fu_inq') || 'null') || [
+  {id:'i1',name:'Sarah K.',company:'Latham & Watkins',email:'sarah.k@lw.com',type:'Book a Session',city:'New York',group:'10–25 people',message:"We'd love a session before our firm retreat — beginner friendly, fun energy preferred. Around 15 people.",date:'Apr 12, 2025',status:'new'},
+  {id:'i2',name:'Daniel R.',company:'Goldman Sachs',email:'d.ryan@gs.com',type:'Book a Session',city:'New York',group:'2–10 people',message:"Looking for a private session focused on restaurant wine list confidence. Big client dinner coming up.",date:'Apr 11, 2025',status:'new'},
+  {id:'i3',name:'Priya S.',company:'McKinsey & Co.',email:'p.sharma@mckinsey.com',type:'Custom Class',city:'Virtual',group:'2–10 people',message:"Flying to Florence in June. Want a crash course on Italian wines. 6 of us.",date:'Apr 9, 2025',status:'read'},
+  {id:'i4',name:'Alex W.',company:'Paul Weiss',email:'a.walker@paulweiss.com',type:'Book a Session',city:'New York',group:'10–25 people',message:"Team happy hour for ~20 people. Mixed experience levels. Something fun and accessible.",date:'Apr 7, 2025',status:'replied'},
+];
+
+let BOOKINGS = JSON.parse(localStorage.getItem('fu_bk') || 'null') || [
+  {id:'b1',client:'Latham & Watkins',sommelier:'Elena Marchetti',date:'2025-04-17',time:'18:00',class:'Wine List 101 · In-Person',status:'confirmed',notes:'12 attendees, Midtown NYC'},
+  {id:'b2',client:'Goldman Sachs',sommelier:'Elena Marchetti',date:'2025-04-19',time:'12:00',class:'Client Dinner Playbook · Virtual',status:'confirmed',notes:'Private 1:1'},
+  {id:'b3',client:'Blackstone',sommelier:'Marcus Webb',date:'2025-04-24',time:'19:00',class:'Old World vs New World · In-Person',status:'pending',notes:'8 attendees'},
+  {id:'b4',client:'McKinsey & Co.',sommelier:'Simone Laurent',date:'2025-04-30',time:'17:30',class:'Italian Wine Deep Dive · Virtual',status:'pending',notes:'6 attendees'},
+  {id:'b5',client:'Deloitte',sommelier:'Elena Marchetti',date:'2025-04-10',time:'16:00',class:'Bubbles Class · Virtual',status:'completed',notes:'22 attendees'},
+];
+
+let PACKAGES = JSON.parse(localStorage.getItem('fu_pkg') || 'null') || [
+  {id:'p1',name:'Lunch & Learn',desc:'60 min · Up to 15 people · Virtual or In-Person · Slides + one-pager included',price:350,duration:'1 hr'},
+  {id:'p2',name:'Team Tasting Evening',desc:'2 hrs · Up to 30 people · In-Person · Wine selection guidance included',price:800,duration:'2 hrs'},
+  {id:'p3',name:'Executive Deep Dive',desc:'3 hrs · Up to 10 people · Customizable curriculum · Pre-session consultation',price:1200,duration:'3 hrs'},
+];
+
+let MESSAGES = JSON.parse(localStorage.getItem('fu_msgs') || 'null') || [
+  {id:'t1',contact:'Sarah K.',company:'Latham & Watkins',email:'sarah.k@lw.com',unread:true,messages:[
+    {from:true,text:"Hi! Quick question — should the team arrive knowing anything in advance, or totally blank slate is fine?",time:'2:14 PM'},
+    {from:false,text:"Blank slate is perfect — honestly preferred! I'll send over a one-page cheat sheet 48 hours before.",time:'2:31 PM'},
+    {from:true,text:"One of our partners is a Napa collector. Should I warn you? 😅",time:'2:33 PM'},
+    {from:false,text:"Ha! I welcome the challenge. Napa collectors always come around when you open the right Chambolle.",time:'2:40 PM'},
+    {from:true,text:"Any wine shop recommendations nearby where we could pick up a bottle before people arrive?",time:'2h ago'},
+  ]},
+  {id:'t2',contact:'Daniel R.',company:'Goldman Sachs',email:'d.ryan@gs.com',unread:true,messages:[
+    {from:true,text:"Can we do Burgundy instead of Bordeaux for the session?",time:'Yesterday'},
+    {from:false,text:"Absolutely — Burgundy is my preferred territory anyway. I'll restructure the session around it.",time:'Yesterday'},
+  ]},
+  {id:'t3',contact:'Priya S.',company:'McKinsey',email:'p.sharma@mckinsey.com',unread:false,messages:[
+    {from:true,text:"Thank you so much for confirming! Really looking forward to it.",time:'Apr 11'},
+  ]},
+];
+
+let editingPkgId = null;
+let editingBookingId = null;
+let currentThreadId = null;
+let editingId = null;
+let loggedInSom = null;
+
+function save() {
+  localStorage.setItem('fu_som', JSON.stringify(SOMMELIERS));
+  localStorage.setItem('fu_inq', JSON.stringify(INQUIRIES));
+  localStorage.setItem('fu_bk', JSON.stringify(BOOKINGS));
+  localStorage.setItem('fu_pkg', JSON.stringify(PACKAGES));
+  localStorage.setItem('fu_msgs', JSON.stringify(MESSAGES));
+}
+
+/* ═══════════════════════════════════════════
+   AUTH
+   ═══════════════════════════════════════════ */
+let currentRole = 'owner';
+
+function selectRole(role, btn) {
+  currentRole = role;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('pin-label').textContent = role === 'owner' ? 'Owner PIN' : 'Your PIN';
+  document.getElementById('login-pin').value = '';
+  const wrap = document.getElementById('som-select-wrap');
+  if (role === 'sommelier') {
+    wrap.style.display = 'block';
+    const sel = document.getElementById('login-som-select');
+    sel.innerHTML = '<option value="">Choose your profile...</option>' + SOMMELIERS.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  } else { wrap.style.display = 'none'; }
+}
+
+function attemptLogin() {
+  const pin = document.getElementById('login-pin').value.trim();
+  const err = document.getElementById('login-error');
+  err.style.display = 'none';
+  if (currentRole === 'owner') {
+    if (pin === OWNER_PIN) launchApp('owner', null);
+    else { err.textContent = 'Incorrect PIN.'; err.style.display = 'block'; }
+  } else {
+    const selId = document.getElementById('login-som-select').value;
+    if (!selId) { err.textContent = 'Please select your name first.'; err.style.display = 'block'; return; }
+    const som = SOMMELIERS.find(s => s.id === selId);
+    if (som && pin === som.pin) launchApp('sommelier', som);
+    else { err.textContent = 'Incorrect PIN.'; err.style.display = 'block'; }
+  }
+}
+
+function launchApp(role, som) {
+  loggedInSom = som;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  if (role === 'owner') {
+    document.getElementById('sidebar-name').textContent = 'Owner';
+    document.getElementById('sidebar-role').textContent = 'Full Access';
+    document.getElementById('sidebar-avatar').textContent = 'B';
+  } else {
+    document.getElementById('sidebar-name').textContent = som.name;
+    document.getElementById('sidebar-role').textContent = 'Sommelier';
+    document.getElementById('sidebar-avatar').innerHTML = `<img src="${som.img}" alt="">`;
+  }
+  buildNav(role);
+  updateStats(); renderDashInquiries(); renderDashBookings(); renderDashSomList();
+  renderInquiries(); renderBookings(); renderOwnerGrid(); renderPins(); renderPkgs();
+  renderCal(); renderAvailToggles(); renderThreadList();
+  if (role === 'owner') showPanelById('panel-dashboard','Dashboard');
+  else {
+    document.getElementById('som-email-field').style.display = 'block';
+    document.getElementById('owner-only-fields').style.display = 'none';
+    openEditSommelier(som.id, true);
+  }
+}
+
+function doLogout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-pin').value = '';
+  loggedInSom = null;
+}
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════ */
+function buildNav(role) {
+  const newInq = INQUIRIES.filter(i => i.status === 'new').length;
+  const newMsg = MESSAGES.filter(m => m.unread).length;
+  const ownerNav = [
+    {s:'Overview'},{id:'panel-dashboard',l:'Dashboard',i:'◈'},
+    {id:'panel-inquiries',l:'Inquiries',i:'◻',b:newInq},
+    {id:'panel-bookings',l:'Bookings',i:'⊞'},
+    {id:'panel-messages',l:'Messages',i:'◉',b:newMsg},
+    {s:'Sommeliers'},{id:'panel-sommeliers-list',l:'Manage Profiles',i:'◎'},
+    {id:'panel-calendar',l:'Calendar',i:'⊡'},
+    {id:'panel-rates',l:'Rates & Packages',i:'◇'},
+    {s:'Settings'},{id:'panel-pins',l:'Manage PINs',i:'⬡'},
+  ];
+  const somNav = [
+    {s:'My Account'},{id:'panel-profile-editor',l:'My Profile',i:'◎'},
+    {id:'panel-calendar',l:'My Calendar',i:'⊡'},
+    {id:'panel-my-rates',l:'My Rates',i:'◇'},
+    {id:'panel-messages',l:'Messages',i:'◉',b:newMsg},
+  ];
+  const items = role === 'owner' ? ownerNav : somNav;
+  document.getElementById('sidebar-nav').innerHTML = items.map(item => {
+    if (item.s) return `<div class="nav-section-label">${item.s}</div>`;
+    const badge = (item.b > 0) ? `<span class="nav-badge">${item.b}</span>` : '';
+    return `<div class="nav-item" data-panel="${item.id}" onclick="showPanel('${item.id.replace('panel-','')}')"><span class="icon">${item.i}</span>${item.l}${badge}</div>`;
+  }).join('');
+}
+
+function showPanel(short) {
+  const id = short.startsWith('panel-') ? short : 'panel-' + short;
+  const labels = {
+    'panel-dashboard':'Dashboard','panel-inquiries':'Inquiries','panel-bookings':'Bookings',
+    'panel-messages':'Messages','panel-sommeliers-list':'Manage Sommeliers',
+    'panel-profile-editor': loggedInSom ? 'My Profile' : 'Edit Profile',
+    'panel-calendar':'Calendar','panel-rates':'Rates & Packages',
+    'panel-my-rates':'My Rates','panel-pins':'Login PINs',
+  };
+  showPanelById(id, labels[id] || '');
+}
+
+function showPanelById(id, title) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  document.getElementById('topbar-title').textContent = title;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.getAttribute('data-panel') === id));
+  const actions = document.getElementById('topbar-actions');
+  if (id === 'panel-sommeliers-list') actions.innerHTML = `<button class="btn btn-wine btn-sm" onclick="openAddSommelier()">+ Add Sommelier</button>`;
+  else if (id === 'panel-bookings') actions.innerHTML = `<button class="btn btn-wine btn-sm" onclick="openAddBookingModal()">+ Add Booking</button>`;
+  else actions.innerHTML = '';
+
+  if (id === 'panel-messages') {
+    const somEmail = loggedInSom ? (loggedInSom.email || '') : '';
+    const note = document.getElementById('msg-email-note');
+    if (note) note.textContent = somEmail ? `Messages also send to ${somEmail}` : 'Add your email in My Profile to get message notifications';
+  }
+}
+
+function updateStats() {
+  const el1 = document.getElementById('stat-inquiries');
+  const el2 = document.getElementById('stat-sommeliers');
+  if (el1) el1.textContent = INQUIRIES.filter(i=>i.status==='new').length;
+  if (el2) el2.textContent = SOMMELIERS.length;
+}
+
+/* ═══════════════════════════════════════════
+   INQUIRIES
+   ═══════════════════════════════════════════ */
+function renderInquiries() {
+  const list = document.getElementById('inquiry-list');
+  if (!list) return;
+  if (!INQUIRIES.length) { list.innerHTML = '<div style="padding:32px;text-align:center;color:rgba(250,247,242,0.3);font-family:var(--font-display);font-size:18px;font-style:italic">No inquiries yet — Formspree is live and ready.</div>'; return; }
+  list.innerHTML = INQUIRIES.map(inq => `
+    <div class="inquiry-row">
+      <div class="inquiry-dot dot-${inq.status}"></div>
+      <div><div class="inquiry-name">${inq.name} <span style="font-size:11px;color:rgba(250,247,242,0.35)">· ${inq.company}</span></div><div class="inquiry-meta">${inq.type} · ${inq.city} · ${inq.group||''}</div></div>
+      <div class="inquiry-time">${inq.date}</div>
+      <span class="status-pill pill-${inq.status}">${inq.status}</span>
+      <button class="btn btn-ghost" onclick="openInquiry('${inq.id}')">View</button>
+    </div>`).join('');
+}
+
+function renderDashInquiries() {
+  const el = document.getElementById('dash-inquiries');
+  if (!el) return;
+  const recent = INQUIRIES.slice(0,3);
+  if (!recent.length) { el.innerHTML = '<div style="padding:16px;font-size:13px;color:rgba(250,247,242,0.3)">No inquiries yet.</div>'; return; }
+  el.innerHTML = recent.map(inq => `
+    <div class="inquiry-row" style="grid-template-columns:8px 1fr auto auto">
+      <div class="inquiry-dot dot-${inq.status}"></div>
+      <div><div class="inquiry-name">${inq.name}</div><div class="inquiry-meta">${inq.type} · ${inq.message.slice(0,45)}...</div></div>
+      <div class="inquiry-time">${inq.date}</div>
+      <button class="btn btn-ghost" onclick="openInquiry('${inq.id}')">View</button>
+    </div>`).join('');
+}
+
+function openInquiry(id) {
+  const inq = INQUIRIES.find(i=>i.id===id);
+  if (!inq) return;
+  if (inq.status==='new') { inq.status='read'; save(); renderInquiries(); renderDashInquiries(); updateStats(); buildNav(loggedInSom?'sommelier':'owner'); }
+  document.getElementById('inq-modal-name').textContent = `${inq.name} — ${inq.type}`;
+  document.getElementById('inq-modal-meta').textContent = `${inq.company} · ${inq.email} · ${inq.date}`;
+  document.getElementById('inq-modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:13px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,247,242,0.3);margin-bottom:5px">City</div><div>${inq.city||'—'}</div></div>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:13px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,247,242,0.3);margin-bottom:5px">Group Size</div><div>${inq.group||'—'}</div></div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);padding:18px;margin-bottom:18px">
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(250,247,242,0.3);margin-bottom:10px">Their Message</div>
+      <p style="font-size:15px;color:var(--cream);line-height:1.65;font-family:var(--font-display);font-style:italic">"${inq.message}"</p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a href="mailto:${inq.email}?subject=Re: Your (f)uncorked Inquiry&body=Hi ${inq.name.split(' ')[0]},%0D%0A%0D%0AThanks for reaching out to (f)uncorked!" class="btn btn-wine" style="flex:1;justify-content:center;text-decoration:none">Reply via Email</a>
+      <button class="btn btn-green btn-sm" onclick="markReplied('${inq.id}')">Mark Replied</button>
+      <button class="btn btn-ghost" onclick="convertToBooking('${inq.id}')">Convert to Booking</button>
+    </div>`;
+  openModal('inquiry-modal');
+}
+
+function markReplied(id) {
+  const inq = INQUIRIES.find(i=>i.id===id);
+  if (inq) { inq.status='replied'; save(); renderInquiries(); renderDashInquiries(); updateStats(); }
+  closeModal('inquiry-modal'); showToast('Marked as replied ✓');
+}
+
+function convertToBooking(id) {
+  const inq = INQUIRIES.find(i=>i.id===id);
+  if (!inq) return;
+  closeModal('inquiry-modal');
+  openAddBookingModal();
+  setTimeout(() => {
+    document.getElementById('bk-client').value = inq.company;
+  }, 100);
+  showToast('Pre-filled from inquiry — complete the booking details');
+}
+
+/* ═══════════════════════════════════════════
+   BOOKINGS
+   ═══════════════════════════════════════════ */
+function renderBookings() {
+  const list = document.getElementById('booking-list');
+  if (!list) return;
+  list.innerHTML = BOOKINGS.map(b => `
+    <div class="booking-row">
+      <div class="booking-dot dot-${b.status}"></div>
+      <div><div class="booking-name">${b.client} <span style="font-size:11px;color:rgba(250,247,242,0.35)">· ${b.sommelier}</span></div><div class="booking-meta">${b.class}${b.notes?' · '+b.notes:''}</div></div>
+      <div class="booking-date">${formatDate(b.date)} · ${b.time}</div>
+      <span class="status-pill pill-${b.status==='confirmed'?'confirmed':b.status==='pending'?'pending':'read'}">${b.status}</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost" onclick="editBooking('${b.id}')">Edit</button>
+        <button class="btn btn-danger" onclick="deleteBooking('${b.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderDashBookings() {
+  const el = document.getElementById('dash-bookings');
+  if (!el) return;
+  const upcoming = BOOKINGS.filter(b=>b.status!=='completed').slice(0,3);
+  if (!upcoming.length) { el.innerHTML = '<div style="padding:16px;font-size:13px;color:rgba(250,247,242,0.3)">No upcoming bookings.</div>'; return; }
+  el.innerHTML = upcoming.map(b => `
+    <div class="booking-row" style="grid-template-columns:8px 1fr auto auto">
+      <div class="booking-dot dot-${b.status}"></div>
+      <div><div class="booking-name">${b.client}</div><div class="booking-meta">${b.class}</div></div>
+      <div class="booking-date">${formatDate(b.date)}</div>
+      <span class="status-pill pill-${b.status==='confirmed'?'confirmed':'pending'}">${b.status}</span>
+    </div>`).join('');
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  try { return new Date(d+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}); } catch { return d; }
+}
+
+function openAddBookingModal() {
+  editingBookingId = null;
+  document.getElementById('bk-client').value = '';
+  document.getElementById('bk-class').value = '';
+  document.getElementById('bk-notes').value = '';
+  document.getElementById('bk-date').value = '';
+  document.getElementById('bk-time').value = '';
+  document.getElementById('bk-status').value = 'confirmed';
+  const sel = document.getElementById('bk-sommelier');
+  sel.innerHTML = SOMMELIERS.map(s=>`<option>${s.name}</option>`).join('');
+  openModal('booking-modal');
+}
+
+function editBooking(id) {
+  const b = BOOKINGS.find(x=>x.id===id);
+  if (!b) return;
+  editingBookingId = id;
+  document.getElementById('bk-client').value = b.client;
+  document.getElementById('bk-class').value = b.class;
+  document.getElementById('bk-notes').value = b.notes||'';
+  document.getElementById('bk-date').value = b.date;
+  document.getElementById('bk-time').value = b.time;
+  document.getElementById('bk-status').value = b.status;
+  const sel = document.getElementById('bk-sommelier');
+  sel.innerHTML = SOMMELIERS.map(s=>`<option ${s.name===b.sommelier?'selected':''}>${s.name}</option>`).join('');
+  openModal('booking-modal');
+}
+
+function saveBooking() {
+  const data = {
+    client: document.getElementById('bk-client').value.trim(),
+    sommelier: document.getElementById('bk-sommelier').value,
+    date: document.getElementById('bk-date').value,
+    time: document.getElementById('bk-time').value,
+    class: document.getElementById('bk-class').value.trim(),
+    status: document.getElementById('bk-status').value,
+    notes: document.getElementById('bk-notes').value.trim(),
+  };
+  if (!data.client) { showToast('Please enter a client name.'); return; }
+  if (editingBookingId) {
+    const idx = BOOKINGS.findIndex(b=>b.id===editingBookingId);
+    if (idx !== -1) BOOKINGS[idx] = {...BOOKINGS[idx],...data};
+  } else {
+    data.id = 'b'+Date.now();
+    BOOKINGS.unshift(data);
+  }
+  save(); renderBookings(); renderDashBookings();
+  closeModal('booking-modal');
+  showToast(editingBookingId ? 'Booking updated ✓' : 'Booking added ✓');
+}
+
+function deleteBooking(id) {
+  if (!confirm('Remove this booking?')) return;
+  BOOKINGS = BOOKINGS.filter(b=>b.id!==id);
+  save(); renderBookings(); renderDashBookings();
+  showToast('Booking removed.');
+}
+
+/* ═══════════════════════════════════════════
+   MESSAGES
+   ═══════════════════════════════════════════ */
+function renderThreadList(filter='') {
+  const container = document.getElementById('thread-list');
+  if (!container) return;
+  const filtered = MESSAGES.filter(t => !filter || t.contact.toLowerCase().includes(filter.toLowerCase()) || t.company.toLowerCase().includes(filter.toLowerCase()));
+  container.innerHTML = filtered.map(t => {
+    const last = t.messages[t.messages.length-1];
+    return `<div class="msg-thread${currentThreadId===t.id?' active':''}" onclick="openThread('${t.id}')">
+      <div class="thread-name">${t.contact}<span class="thread-time">${last.time}</span></div>
+      <div style="display:flex;gap:6px;align-items:flex-start">
+        <div class="thread-preview" style="flex:1">${last.text}</div>
+        ${t.unread?'<div class="thread-unread"></div>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterThreads(val) { renderThreadList(val); }
+
+function openThread(id) {
+  const thread = MESSAGES.find(t=>t.id===id);
+  if (!thread) return;
+  currentThreadId = id;
+  thread.unread = false;
+  save();
+  renderThreadList();
+  buildNav(loggedInSom?'sommelier':'owner');
+
+  const detail = document.getElementById('msg-detail');
+  const somEmail = loggedInSom ? (loggedInSom.email || '') : '';
+  detail.innerHTML = `
+    <div class="msg-detail-header">
+      <div class="detail-name">${thread.contact}</div>
+      <div class="detail-sub">${thread.company} · ${thread.email}</div>
+    </div>
+    <div class="msg-body" id="active-msg-body">
+      ${thread.messages.map(m=>`
+        <div class="msg-bubble ${m.from?'from':'to'}">
+          <div class="bubble-text">${m.text}</div>
+          <div class="bubble-meta">${m.from?thread.contact:'You'} · ${m.time}</div>
+        </div>`).join('')}
+    </div>
+    ${somEmail ? `<div class="compose-meta" style="padding:6px 22px 0">Messages will also send to <strong>${somEmail}</strong></div>` : ''}
+    <div class="msg-compose">
+      <textarea class="compose-input" id="compose-text" placeholder="Type a message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg('${id}')}"></textarea>
+      <button class="btn btn-wine btn-sm" onclick="sendMsg('${id}')">Send</button>
+    </div>`;
+  const body = document.getElementById('active-msg-body');
+  if (body) body.scrollTop = body.scrollHeight;
+}
+
+function sendMsg(threadId) {
+  const thread = MESSAGES.find(t=>t.id===threadId);
+  const input = document.getElementById('compose-text');
+  if (!thread || !input || !input.value.trim()) return;
+  const text = input.value.trim();
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  thread.messages.push({from:false,text,time});
+  input.value = '';
+  save();
+  // If sommelier has email set, note that it would send
+  const somEmail = loggedInSom ? (loggedInSom.email || '') : '';
+  if (somEmail) showToast(`Sent — copy also going to ${somEmail}`);
+  else showToast('Message sent ✓');
+  openThread(threadId);
+}
+
+/* ═══════════════════════════════════════════
+   SOMMELIER GRID
+   ═══════════════════════════════════════════ */
+function renderOwnerGrid() {
+  const grid = document.getElementById('owner-som-grid');
+  if (!grid) return;
+  grid.innerHTML = SOMMELIERS.map(s => `
+    <div class="som-card">
+      <div class="som-card-img"><img src="${s.img}" alt="${s.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'"></div>
+      <div class="som-card-body">
+        <div class="som-card-name">${s.name}</div>
+        <div class="som-card-rest">${s.restaurant}</div>
+        <div class="som-card-meta">$${s.price}/hr · ${s.city} · ${s.format}${s.email?' · ✉':''}
+        </div>
+        <div class="som-card-footer">
+          <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="openEditSommelier('${s.id}',false)">Edit</button>
+          <button class="btn btn-danger" onclick="confirmDelete('${s.id}')">Delete</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderDashSomList() {
+  const el = document.getElementById('dash-som-list');
+  if (!el) return;
+  el.innerHTML = SOMMELIERS.map(s => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border)">
+      <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${s.img}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"></div>
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">${s.name}</div><div style="font-size:11px;color:rgba(250,247,242,0.38)">${s.city} · $${s.price}/hr</div></div>
+      <button class="btn btn-ghost" onclick="openEditSommelier('${s.id}',false)">Edit</button>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════
+   PROFILE EDITOR
+   ═══════════════════════════════════════════ */
+let currentImgData = '';
+
+function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 4 * 1024 * 1024) { showToast('Image too large — please use under 4MB'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    currentImgData = e.target.result;
+    document.getElementById('photo-thumb').src = currentImgData;
+    document.getElementById('preview-img').src = currentImgData;
+    document.getElementById('ef-img-url').value = '';
+    showToast('Photo loaded ✓');
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyImgUrl(url) {
+  if (!url) return;
+  currentImgData = '';
+  document.getElementById('preview-img').src = url;
+  document.getElementById('photo-thumb').src = url;
+}
+
+function openAddSommelier() {
+  editingId = null;
+  currentImgData = '';
+  document.getElementById('editor-title').textContent = 'Add New Sommelier';
+  document.getElementById('delete-btn').style.display = 'none';
+  document.getElementById('back-btn').style.display = 'inline-flex';
+  document.getElementById('owner-only-fields').style.display = 'block';
+  document.getElementById('som-email-field').style.display = 'none';
+  ['ef-first','ef-last','ef-restaurant','ef-bio','ef-img-url','ef-pin','ef-email'].forEach(id => {const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('ef-price').value = '';
+  document.getElementById('ef-format').value = 'both';
+  document.getElementById('ef-city').value = 'New York';
+  document.getElementById('ef-tags-wrap').innerHTML = '';
+  const thumb = document.getElementById('photo-thumb');
+  const prev = document.getElementById('preview-img');
+  const defaultImg = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80';
+  thumb.src = defaultImg; prev.src = defaultImg;
+  livePreview();
+  showPanelById('panel-profile-editor','Add Sommelier');
+}
+
+function openEditSommelier(id, isSomSelf) {
+  const s = SOMMELIERS.find(s=>s.id===id);
+  if (!s) return;
+  editingId = id;
+  currentImgData = s.img && s.img.startsWith('data:') ? s.img : '';
+  document.getElementById('editor-title').textContent = isSomSelf ? 'My Profile' : `Editing: ${s.name}`;
+  document.getElementById('delete-btn').style.display = isSomSelf ? 'none' : 'block';
+  document.getElementById('back-btn').style.display = isSomSelf ? 'none' : 'inline-flex';
+  document.getElementById('owner-only-fields').style.display = isSomSelf ? 'none' : 'block';
+  document.getElementById('som-email-field').style.display = isSomSelf ? 'block' : 'none';
+  document.getElementById('ef-first').value = s.name.split(' ')[0]||'';
+  document.getElementById('ef-last').value = s.name.split(' ').slice(1).join(' ')||'';
+  document.getElementById('ef-restaurant').value = s.restaurant;
+  document.getElementById('ef-city').value = s.city;
+  document.getElementById('ef-format').value = s.format;
+  document.getElementById('ef-price').value = s.price;
+  document.getElementById('ef-bio').value = s.bio;
+  document.getElementById('ef-img-url').value = s.img && !s.img.startsWith('data:') ? s.img : '';
+  document.getElementById('ef-pin').value = s.pin||'';
+  document.getElementById('ef-email').value = s.email||'';
+  const somEmailFld = document.getElementById('ef-email-som');
+  if (somEmailFld) somEmailFld.value = s.email||'';
+  const imgSrc = s.img || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80';
+  document.getElementById('photo-thumb').src = imgSrc;
+  document.getElementById('preview-img').src = imgSrc;
+  document.getElementById('ef-tags-wrap').innerHTML = (s.specialty||[]).map(t => `<div class="spec-tag">${t} <button onclick="this.parentElement.remove();syncTags()">×</button></div>`).join('');
+  livePreview();
+  showPanelById('panel-profile-editor', isSomSelf ? 'My Profile' : `Editing: ${s.name}`);
+}
+
+function livePreview() {
+  const name = (document.getElementById('ef-first').value+' '+document.getElementById('ef-last').value).trim()||'Name';
+  document.getElementById('preview-name').textContent = name;
+  document.getElementById('preview-rest').textContent = document.getElementById('ef-restaurant').value||'Restaurant';
+  document.getElementById('preview-bio').textContent = document.getElementById('ef-bio').value||'Bio preview...';
+  document.getElementById('preview-price').innerHTML = `$${document.getElementById('ef-price').value||'0'}<span>/hour</span>`;
+  syncTags();
+}
+
+function editorAddTag() {
+  const inp = document.getElementById('ef-new-tag');
+  const val = inp.value.trim();
+  if (!val) return;
+  const wrap = document.getElementById('ef-tags-wrap');
+  const div = document.createElement('div');
+  div.className = 'spec-tag';
+  div.innerHTML = `${val} <button onclick="this.parentElement.remove();syncTags()">×</button>`;
+  wrap.appendChild(div);
+  inp.value = ''; syncTags();
+}
+
+function syncTags() {
+  const tags = [...document.querySelectorAll('#ef-tags-wrap .spec-tag')].map(t=>t.textContent.trim().slice(0,-1).trim());
+  document.getElementById('preview-tags').innerHTML = tags.map(t=>`<span class="preview-tag">${t}</span>`).join('');
+}
+
+function saveProfile() {
+  const first = document.getElementById('ef-first').value.trim();
+  if (!first) { showToast('Please enter a name.'); return; }
+  const tags = [...document.querySelectorAll('#ef-tags-wrap .spec-tag')].map(t=>t.textContent.trim().slice(0,-1).trim());
+  const imgUrl = document.getElementById('ef-img-url').value.trim();
+  const finalImg = currentImgData || imgUrl || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80';
+  const pinVal = document.getElementById('ef-pin').value.trim();
+  const emailOwner = document.getElementById('ef-email').value.trim();
+  const emailSom = document.getElementById('ef-email-som') ? document.getElementById('ef-email-som').value.trim() : '';
+  const data = {
+    name:(first+' '+document.getElementById('ef-last').value.trim()).trim(),
+    restaurant:document.getElementById('ef-restaurant').value.trim(),
+    city:document.getElementById('ef-city').value,
+    format:document.getElementById('ef-format').value,
+    price:parseInt(document.getElementById('ef-price').value)||150,
+    bio:document.getElementById('ef-bio').value.trim(),
+    img:finalImg,
+    specialty:tags,
+    badge:null,
+    pin:pinVal||'0000',
+    email:loggedInSom ? emailSom : emailOwner,
+  };
+  if (editingId) {
+    const idx = SOMMELIERS.findIndex(s=>s.id===editingId);
+    if (idx!==-1) SOMMELIERS[idx]={...SOMMELIERS[idx],...data};
+    if (loggedInSom) loggedInSom = SOMMELIERS[idx];
+  } else {
+    data.id='s'+Date.now(); SOMMELIERS.push(data);
+  }
+  save(); renderOwnerGrid(); renderDashSomList(); renderPins(); updateStats();
+  showToast(editingId ? 'Profile updated ✓' : 'Sommelier added ✓');
+  if (!loggedInSom) setTimeout(()=>showPanelById('panel-sommeliers-list','Manage Sommeliers'),700);
+}
+
+function deleteProfile() { if (editingId) confirmDelete(editingId); }
+
+function confirmDelete(id) {
+  if (!confirm('Remove this sommelier?')) return;
+  SOMMELIERS = SOMMELIERS.filter(s=>s.id!==id);
+  save(); renderOwnerGrid(); renderDashSomList(); renderPins(); updateStats();
+  showToast('Sommelier removed.'); showPanelById('panel-sommeliers-list','Manage Sommeliers');
+}
+
+/* ═══════════════════════════════════════════
+   RATES & PACKAGES
+   ═══════════════════════════════════════════ */
+function renderPkgs() {
+  const list = document.getElementById('pkg-list');
+  if (!list) return;
+  if (!PACKAGES.length) { list.innerHTML = '<div style="padding:20px;color:rgba(250,247,242,0.3);font-size:13px">No packages yet.</div>'; return; }
+  list.innerHTML = PACKAGES.map(p => `
+    <div class="pkg-item">
+      <div><div class="pkg-name">${p.name}</div><div class="pkg-desc">${p.desc}</div></div>
+      <div class="pkg-price">$${p.price.toLocaleString()}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="editPkg('${p.id}')">Edit</button>
+        <button class="btn btn-danger" onclick="deletePkg('${p.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function openPkgModal(id) {
+  editingPkgId = id||null;
+  if (id) {
+    const p = PACKAGES.find(x=>x.id===id);
+    if (p) {
+      document.getElementById('pkg-name').value=p.name;
+      document.getElementById('pkg-desc').value=p.desc;
+      document.getElementById('pkg-price').value=p.price;
+      document.getElementById('pkg-duration').value=p.duration||'';
+    }
+    document.getElementById('pkg-modal-title').textContent='Edit Package';
+  } else {
+    ['pkg-name','pkg-desc','pkg-duration'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('pkg-price').value='';
+    document.getElementById('pkg-modal-title').textContent='Add Package';
+  }
+  openModal('pkg-modal');
+}
+
+function editPkg(id) { openPkgModal(id); }
+
+function savePkg() {
+  const data = {name:document.getElementById('pkg-name').value.trim(),desc:document.getElementById('pkg-desc').value.trim(),price:parseInt(document.getElementById('pkg-price').value)||0,duration:document.getElementById('pkg-duration').value.trim()};
+  if (!data.name) { showToast('Package name required.'); return; }
+  if (editingPkgId) {
+    const idx=PACKAGES.findIndex(p=>p.id===editingPkgId);
+    if (idx!==-1) PACKAGES[idx]={...PACKAGES[idx],...data};
+  } else { data.id='p'+Date.now(); PACKAGES.push(data); }
+  save(); renderPkgs(); closeModal('pkg-modal'); showToast('Package saved ✓');
+}
+
+function deletePkg(id) {
+  if (!confirm('Remove this package?')) return;
+  PACKAGES=PACKAGES.filter(p=>p.id!==id);
+  save(); renderPkgs(); showToast('Package removed.');
+}
+
+function saveRates() { showToast('Rate limits saved ✓'); }
+
+function exportSommelierCode() {
+  const box = document.getElementById('export-code-box');
+  const code = document.getElementById('export-code');
+  const jsCode = SOMMELIERS.map(s => {
+    const imgVal = s.img && s.img.startsWith('data:') ? '"[base64 photo — keep in admin, use URL on public site]"' : `"${s.img}"`;
+    return `  {\n    name: "${s.name}",\n    restaurant: "${s.restaurant}",\n    city: "${s.city}",\n    price: ${s.price},\n    format: "${s.format}",\n    specialty: [${s.specialty.map(t=>`"${t}"`).join(', ')}],\n    bio: "${s.bio.replace(/"/g,"'")}",\n    badge: ${s.badge?`"${s.badge}"`:'null'},\n    img: ${imgVal}\n  }`;
+  }).join(',\n');
+  code.textContent = `const SOMMELIERS = [\n${jsCode}\n];`;
+  box.style.display = 'block';
+}
+
+function copyExport() {
+  const text = document.getElementById('export-code').textContent;
+  navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard ✓'));
+}
+
+/* ═══════════════════════════════════════════
+   PINS
+   ═══════════════════════════════════════════ */
+function renderPins() {
+  const list = document.getElementById('pin-list');
+  if (!list) return;
+  list.innerHTML = SOMMELIERS.map(s => `
+    <div class="pin-row">
+      <span class="pin-label">${s.name}${s.email?` <span style="font-size:11px;color:rgba(250,247,242,0.35)">· ${s.email}</span>`:''}</span>
+      <span class="pin-value">${s.pin||'not set'}</span>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════
+   CALENDAR
+   ═══════════════════════════════════════════ */
+let calYear=2025, calMonth=3;
+const CAL_EVENTS={'2025-4-17':[{label:'Latham & Watkins',type:'booked'}],'2025-4-19':[{label:'Goldman Sachs',type:'virtual'}],'2025-4-24':[{label:'Blackstone',type:'booked'}],'2025-4-30':[{label:'McKinsey',type:'virtual'}],'2025-4-22':[{label:'Blocked',type:'blocked'}],'2025-4-23':[{label:'Blocked',type:'blocked'}]};
+
+function renderCal() {
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent=months[calMonth]+' '+calYear;
+  const fd=new Date(calYear,calMonth,1).getDay(), dim=new Date(calYear,calMonth+1,0).getDate(), dip=new Date(calYear,calMonth,0).getDate();
+  const today=new Date(), tk=`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+  let html='',cells=0;
+  for(let i=fd-1;i>=0;i--){html+=`<div class="cal-day other-month"><div class="day-num">${dip-i}</div></div>`;cells++;}
+  for(let d=1;d<=dim;d++){
+    const key=`${calYear}-${calMonth+1}-${d}`;
+    const events=CAL_EVENTS[key]||[];
+    html+=`<div class="cal-day${key===tk?' today':''}" onclick="showToast('Click to add booking')"><div class="day-num">${d}</div>${events.map(e=>`<div class="cal-event event-${e.type}">${e.label}</div>`).join('')}</div>`;cells++;
+  }
+  const rem=cells%7===0?0:7-(cells%7);
+  for(let i=1;i<=rem;i++) html+=`<div class="cal-day other-month"><div class="day-num">${i}</div></div>`;
+  document.getElementById('cal-days').innerHTML=html;
+}
+function changeMonth(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCal();}
+function renderAvailToggles(){
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],def=[true,true,false,true,true,true,false];
+  const el=document.getElementById('avail-toggles');if(!el)return;
+  el.innerHTML=days.map((d,i)=>`<div class="avail-row"><span class="avail-day">${d}</span><label class="toggle"><input type="checkbox" ${def[i]?'checked':''} onchange="showToast('Saved!')"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>`).join('');
+}
+
+/* ═══════════════════════════════════════════
+   MODAL HELPERS
+   ═══════════════════════════════════════════ */
+function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id, e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById(id).classList.remove('open'); document.body.style.overflow='';
+}
+
+/* TOAST */
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>{m.classList.remove('open');document.body.style.overflow='';});});
+</script>
+</body>
+</html>
